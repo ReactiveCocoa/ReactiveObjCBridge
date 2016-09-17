@@ -122,11 +122,11 @@ extension RACSignal {
 	public func toSignalProducer(file: String = #file, line: Int = #line) -> SignalProducer<Any?, NSError> {
 		return SignalProducer { observer, disposable in
 			let next = { obj in
-				observer.sendNext(obj)
+				observer.send(value: obj)
 			}
 
 			let failed: (_ nsError: Swift.Error?) -> () = {
-				observer.sendFailed(($0 as? NSError) ?? defaultNSError("Nil RACSignal error", file: file, line: line))
+				observer.send(error: ($0 as? NSError) ?? defaultNSError("Nil RACSignal error", file: file, line: line))
 			}
 
 			let completed = {
@@ -149,7 +149,7 @@ extension SignalProducerProtocol {
 		return RACSignal.createSignal { subscriber in
 			let selfDisposable = self.start { event in
 				switch event {
-				case let .next(value):
+				case let .value(value):
 					subscriber.sendNext(value)
 				case let .failed(error):
 					subscriber.sendError(error)
@@ -177,7 +177,7 @@ extension SignalProtocol {
 		return RACSignal.createSignal { subscriber in
 			let selfDisposable = self.observe { event in
 				switch event {
-				case let .next(value):
+				case let .value(value):
 					subscriber.sendNext(value)
 				case let .failed(error):
 					subscriber.sendError(error)

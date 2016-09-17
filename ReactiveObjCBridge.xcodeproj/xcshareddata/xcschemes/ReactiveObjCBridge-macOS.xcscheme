@@ -73,7 +73,7 @@
                BlueprintIdentifier = "D04725E919E49ED7006002AA"
                BuildableName = "ReactiveObjC.framework"
                BlueprintName = "ReactiveObjC-macOS"
-               ReferencedContainer = "container:ReactiveObjC.xcodeproj">
+               ReferencedContainer = "container:Carthage/Checkouts/ReactiveObjC/ReactiveObjC.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry

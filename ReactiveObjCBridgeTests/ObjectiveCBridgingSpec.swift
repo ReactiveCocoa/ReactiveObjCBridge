@@ -109,7 +109,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					expect(lastValue).to(beNil())
 
 					for number in [1, 2, 3] {
-						observer.sendNext(number as NSNumber)
+						observer.send(value: number as NSNumber)
 						expect(lastValue) == number as NSNumber
 					}
 
@@ -130,7 +130,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 						return
 					}
 
-					observer.sendFailed(expectedError)
+					observer.send(error: expectedError)
 					expect(error) == expectedError
 				}
 				
@@ -145,7 +145,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 						return
 					}
 					
-					observer.sendFailed(testNSError)
+					observer.send(error: testNSError)
 
 					expect(error) == userInfo[key]
 				}
@@ -266,7 +266,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				expect(action.isEnabled.value) == true
 
-				action.values.observeNext { results.append($0) }
+				action.values.observeValues { results.append($0) }
 
 				command = action.toRACCommand()
 				expect(command).notTo(beNil())

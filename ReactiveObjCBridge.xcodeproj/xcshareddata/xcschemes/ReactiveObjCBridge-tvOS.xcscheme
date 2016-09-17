@@ -73,7 +73,7 @@
                BlueprintIdentifier = "57A4D1AF1BA13D7A00F7D4B1"
                BuildableName = "ReactiveObjC.framework"
                BlueprintName = "ReactiveObjC-tvOS"
-               ReferencedContainer = "container:ReactiveObjC.xcodeproj">
+               ReferencedContainer = "container:Carthage/Checkouts/ReactiveObjC/ReactiveObjC.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
