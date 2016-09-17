@@ -1,118 +1,102 @@
-![](Logo/header.png)
+# ReactiveObjCBridge
 
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![GitHub release](https://img.shields.io/github/release/ReactiveCocoa/ReactiveCocoa.svg)](https://github.com/ReactiveCocoa/ReactiveCocoa/releases) ![Swift 3.0.x](https://img.shields.io/badge/Swift-3.0.x-orange.svg) ![platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20OS%20X%20%7C%20watchOS%20%7C%20tvOS%20-lightgrey.svg)
+After announced Swift, ReactiveCocoa was rewritten in Swift. This framework
+creates a bridge between those Swift and Objective-C APIs ([ReactiveSwift][]
+and [ReactiveObjC][]).
 
-ReactiveCocoa (RAC) is a Cocoa framework built on top of [ReactiveSwift][]. It
-provides APIs for using ReactiveSwift with Apple's Cocoa frameworks.
+Because the APIs are based on fundamentally different designs, the conversion is not always one-to-one; however, every attempt has been made to faithfully translate the concepts between the two APIs (and languages).
 
- 1. [Introduction](#introduction)
- 1. [Example: online search](#example-online-search)
- 1. [Objective-C and Swift](#objective-c-and-swift)
- 1. [How does ReactiveCocoa relate to Rx?](#how-does-reactivecocoa-relate-to-rx)
- 1. [Getting started](#getting-started)
+The bridged types include:
 
-If you’re already familiar with functional reactive programming or what
-ReactiveCocoa is about, check out the [Documentation][] folder for more in-depth
-information about how it all works. Then, dive straight into our [documentation
-comments][Code] for learning more about individual APIs.
+ 1. [`RACSignal` and `SignalProducer` or `Signal`](#racsignal-and-signalproducer-or-signal)
+ 1. [`RACCommand` and `Action`](#raccommand-and-action)
+ 1. [`RACScheduler` and `SchedulerType`](#racscheduler-and-schedulertype)
+ 1. [`RACDisposable` and `Disposable`](#racdisposable-and-disposable)
 
-If you have a question, please see if any discussions in our [GitHub
-issues](https://github.com/ReactiveCocoa/ReactiveCocoa/issues?q=is%3Aissue+label%3Aquestion+) or [Stack
-Overflow](http://stackoverflow.com/questions/tagged/reactive-cocoa) have already
-answered it. If not, please feel free to [file your
-own](https://github.com/ReactiveCocoa/ReactiveCocoa/issues/new)!
+For the complete bridging API, including documentation, see [`ObjectiveCBridging.swift`][ObjectiveCBridging].
 
-#### Compatibility
+## `RACSignal` and `SignalProducer` or `Signal`
 
-This documents the RAC 5 which targets `Swift 3.0.x`. For `Swift 2.x` support see [RAC
-4](https://github.com/ReactiveCocoa/ReactiveCocoa/tree/v4.0.0).
+In RAC 3, “cold” signals are represented by the `SignalProducer` type, and “hot” signals are represented by the `Signal` type.
 
-## Introduction
+“Cold” `RACSignal`s can be converted into `SignalProducer`s using the new `toSignalProducer` method:
 
-ReactiveCocoa is inspired by [functional reactive
-programming](https://joshaber.github.io/2013/02/11/input-and-output/).
-Rather than using mutable variables which are replaced and modified in-place,
-RAC offers “event streams,” represented by the [`Signal`][Signals] and
-[`SignalProducer`][Signal producers] types, that send values over time.
-
-Event streams unify all of Cocoa’s common patterns for asynchrony and event
-handling, including:
-
- * Delegate methods
- * Callback blocks
- * `NSNotification`s
- * Control actions and responder chain events
- * [Futures and promises](https://en.wikipedia.org/wiki/Futures_and_promises)
- * [Key-value observing](https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/KeyValueObserving/KeyValueObserving.html) (KVO)
-
-Because all of these different mechanisms can be represented in the _same_ way,
-it’s easy to declaratively chain and combine them together, with less spaghetti
-code and state to bridge the gap.
-
-For more information about the concepts in ReactiveCocoa, see [ReactiveSwift][].
-
-## Objective-C and Swift
-
-Although ReactiveCocoa was started as an Objective-C framework, as of [version
-3.0][CHANGELOG], all major feature development is concentrated on the [Swift API][].
-
-RAC’s [Objective-C API][] and Swift API are entirely separate, but there is
-a [bridge][Objective-C Bridging] to convert between the two. This
-is mostly meant as a compatibility layer for older ReactiveCocoa projects, or to
-use Cocoa extensions which haven’t been added to the Swift API yet.
-
-The Objective-C API will continue to exist and be supported for the foreseeable
-future, but it won’t receive many improvements. For more information about using
-this API, please consult our [legacy documentation][].
-
-**We highly recommend that all new projects use the Swift API.**
-
-## Getting started
-
-ReactiveCocoa supports `OS X 10.9+`, `iOS 8.0+`, `watchOS 2.0`, and `tvOS 9.0`.
-
-To add RAC to your application:
-
- 1. Add the ReactiveCocoa repository as a
-    [submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) of your
-    application’s repository.
- 1. Run `git submodule update --init --recursive` from within the ReactiveCocoa folder.
- 1. Drag and drop `ReactiveCocoa.xcodeproj`,
-    `Carthage/Checkouts/ReactiveSwift/ReactiveSwift.xcodeproj`, and
-    `Carthage/Checkouts/Result/Result.xcodeproj` into your application’s Xcode
-    project or workspace.
- 1. On the “General” tab of your application target’s settings, add
-    `ReactiveCocoa.framework`, `ReactiveSwift.framework`, and `Result.framework`
-    to the “Embedded Binaries” section.
- 1. If your application target does not contain Swift code at all, you should also
-    set the `EMBEDDED_CONTENT_CONTAINS_SWIFT` build setting to “Yes”.
-
-Or, if you’re using [Carthage](https://github.com/Carthage/Carthage), simply add
-ReactiveCocoa to your `Cartfile`:
-
+```swift
+extension RACSignal {
+	func toSignalProducer() -> SignalProducer<AnyObject?, NSError>
+}
 ```
-github "ReactiveCocoa/ReactiveCocoa"
+
+“Hot” `RACSignal`s cannot be directly converted into `Signal`s, because _any_ `RACSignal` subscription could potentially involve side effects. To obtain a `Signal`, use `RACSignal.toSignalProducer` followed by `SignalProducer.start`, which will make those potential side effects explicit.
+
+For the other direction, use the `toRACSignal()` function.
+
+When called with a `SignalProducer`, these functions will create a `RACSignal` to `start()` the producer once for each subscription:
+
+```swift
+func toRACSignal<T: AnyObject, E>(producer: SignalProducer<T, E>) -> RACSignal
+func toRACSignal<T: AnyObject, E>(producer: SignalProducer<T?, E>) -> RACSignal
 ```
-Make sure to add `ReactiveCocoa.framework`, `ReactiveSwift`, and `Result.framework` to "Linked Frameworks and Libraries" and "copy-frameworks" Build Phases.
 
-If you would prefer to use [CocoaPods](https://cocoapods.org), there are some
-[unofficial podspecs](https://github.com/CocoaPods/Specs/tree/master/Specs/ReactiveCocoa)
-that have been generously contributed by third parties.
+When called with a `Signal`, these functions will create a `RACSignal` that simply observes it:
 
-Once you’ve set up your project, check out the [Framework Overview][] for
-a tour of ReactiveCocoa’s concepts, and the [Basic Operators][] for some
-introductory examples of using it.
+```swift
+func toRACSignal<T: AnyObject, E>(signal: Signal<T, E>) -> RACSignal
+func toRACSignal<T: AnyObject, E>(signal: Signal<T?, E>) -> RACSignal
+```
 
-[ReactiveSwift]: https://github.com/ReactiveCocoa/ReactiveSwift
-[Actions]: Documentation/FrameworkOverview.md#actions
-[Basic Operators]: Documentation/BasicOperators.md
-[CHANGELOG]: CHANGELOG.md
-[Code]: ReactiveCocoa
-[Documentation]: Documentation
-[Framework Overview]: Documentation/FrameworkOverview.md
-[Legacy Documentation]: Documentation/Legacy
-[Objective-C API]: ReactiveCocoa/Objective-C
-[Objective-C Bridging]: Documentation/ObjectiveCBridging.md
-[Signal producers]: Documentation/FrameworkOverview.md#signal-producers
-[Signals]: Documentation/FrameworkOverview.md#signals
-[Swift API]: ReactiveCocoa/Swift
+## `RACCommand` and `Action`
+
+To convert `RACCommand`s into the new `Action` type, use the `toAction()` extension method:
+
+```swift
+extension RACCommand {
+	func toAction() -> Action<AnyObject?, AnyObject?, NSError>
+}
+```
+
+To convert `Action`s into `RACCommand`s, use the `toRACCommand()` function:
+
+```swift
+func toRACCommand<Output: AnyObject, E>(action: Action<AnyObject, Output, E>) -> RACCommand
+func toRACCommand<Output: AnyObject, E>(action: Action<AnyObject?, Output, E>) -> RACCommand
+```
+
+**NOTE:** The `executing` properties of actions and commands are not synchronized across the API bridge. To ensure consistency, only observe the `executing` property from the base object (the one passed _into_ the bridge, not retrieved from it), so updates occur no matter which object is used for execution.
+
+## `RACScheduler` and `SchedulerType`
+
+Any `RACScheduler` instance is automatically a `DateSchedulerType` (and therefore a `SchedulerType`), and can be passed directly into any function or method that expects one.
+
+Some (but not all) `SchedulerType`s from RAC 3 can be converted into `RACScheduler` instances, using the `toRACScheduler()` method:
+
+```swift
+extension ImmediateScheduler {
+	func toRACScheduler() -> RACScheduler
+}
+
+extension UIScheduler {
+	func toRACScheduler() -> RACScheduler
+}
+
+extension QueueScheduler {
+	func toRACScheduler() -> RACScheduler
+}
+```
+
+## `RACDisposable` and `Disposable`
+
+Any `RACDisposable` instance is automatically a `Disposable`, and can be used directly anywhere a type conforming to `Disposable` is expected.
+
+Although there is no direct conversion from `Disposable` into `RACDisposable`, it is easy to do manually:
+
+```swift
+let swiftDisposable: Disposable
+let objcDisposable = RACDisposable {
+    swiftDisposable.dispose()
+}
+```
+
+[ReactiveSwift]: https://github.com/ReactiveCocoa/ReactiveSwift/
+[ReactiveObjC]: https://github.com/ReactiveCocoa/ReactiveObjC/
+[ObjectiveCBridging]: ReactiveObjCBridge/ObjectiveCBridging.swift
