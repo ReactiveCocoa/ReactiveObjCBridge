@@ -1,2 +1,2 @@
 github "ReactiveCocoa/ReactiveObjC" "master"
-github "ReactiveCocoa/ReactiveSwift" "master"
+github "ReactiveCocoa/ReactiveSwift" "1.0.0-alpha.1"
