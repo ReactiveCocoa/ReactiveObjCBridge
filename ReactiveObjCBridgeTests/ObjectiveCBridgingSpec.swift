@@ -149,6 +149,14 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 					expect(error) == userInfo[key]
 				}
+				
+				it("should bridge next events with value Optional<Any>.none to nil in Objective-C") {
+					let producer = SignalProducer<Optional<Any>, NSError>(value: nil)
+					let racSignal = producer.toRACSignal().materialize()
+					
+					let event = racSignal.first() as? RACEvent
+					expect(event?.value).to(beNil())
+				}
 			}
 
 			describe("on a SignalProducer") {
@@ -184,6 +192,14 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					let event = racSignal.first() as? RACEvent
 					let userInfoValue = event?.error?.localizedDescription
 					expect(userInfoValue) == userInfo[key]
+				}
+				
+				it("should bridge next events with value Optional<Any>.none to nil in Objective-C") {
+					let producer = SignalProducer<Optional<Any>, NSError>(value: nil)
+					let racSignal = producer.toRACSignal().materialize()
+					
+					let event = racSignal.first() as? RACEvent
+					expect(event?.value).to(beNil())
 				}
 			}
 		}
@@ -298,6 +314,21 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				} catch {
 					XCTFail("Failed to wait for completion")
 				}
+			}
+		}
+		
+		describe("RACSubscriber.sendNext") {
+			
+			it("should have an argument of type Optional.none represented as `nil`") {
+				let racSignal = RACSignal.createSignal { subscriber in
+					subscriber.sendNext(Optional<Any>.none)
+					subscriber.sendCompleted()
+					return nil
+				}
+				
+				let event = racSignal.first() as? RACEvent
+				let value = event?.value
+				expect(value).to(beNil())
 			}
 		}
 	}
