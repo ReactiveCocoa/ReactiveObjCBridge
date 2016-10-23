@@ -337,41 +337,7 @@ extension ActionProtocol where Input: AnyObject {
 	}
 }
 
-extension ActionProtocol where Input: AnyObject, Output: OptionalProtocol {
-	/// Creates a RACCommand that will execute the action.
-	///
-	/// - note: The returned command will not necessarily be marked as executing
-	///         when the action is. However, the reverse is always true: the Action
-	///         will always be marked as executing when the RACCommand is.
-	///
-	/// - returns: `RACCommand` with bound action.
-	public func toRACCommand() -> RACCommand<Input> {
-		return RACCommand<Input>(enabled: action.isCommandEnabled) { input -> RACSignal in
-			return self
-				.apply(input!)
-				.toRACSignal()
-		}
-	}
-}
-
 extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject {
-	/// Creates a RACCommand that will execute the action.
-	///
-	/// - note: The returned command will not necessarily be marked as executing
-	///         when the action is. However, the reverse is always true: the Action
-	///         will always be marked as executing when the RACCommand is.
-	///
-	/// - returns: `RACCommand` with bound action.
-	public func toRACCommand() -> RACCommand<Input.Wrapped> {
-		return RACCommand<Input.Wrapped>(enabled: action.isCommandEnabled) { input -> RACSignal in
-			return self
-				.apply(Input(reconstructing: input))
-				.toRACSignal()
-		}
-	}
-}
-
-extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: OptionalProtocol {
 	/// Creates a RACCommand that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
