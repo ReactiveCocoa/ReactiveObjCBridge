@@ -172,6 +172,9 @@ extension SignalProducerProtocol where Self.Value: OptionalProtocol {
 	/// subscription.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
+	/// - note: This overload is necessary to prevent `Optional.none` from
+	///         being bridged to `NSNull` (instead of `nil`).
+	///         See ReactiveObjCBridge#5 for more details.
 	///
 	/// - returns: `RACSignal` instantiated from `self`.
 	public func toRACSignal() -> RACSignal {
@@ -228,6 +231,9 @@ extension SignalProtocol where Self.Value: OptionalProtocol {
 	/// Create a `RACSignal` that will observe the given signal.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
+	/// - note: This overload is necessary to prevent `Optional.none` from 
+	///         being bridged to `NSNull` (instead of `nil`).
+	///         See ReactiveObjCBridge#5 for more details.
 	///
 	/// - returns: `RACSignal` instantiated from `self`.
 	public func toRACSignal() -> RACSignal {
