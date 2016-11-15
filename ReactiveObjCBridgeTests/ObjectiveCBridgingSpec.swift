@@ -70,7 +70,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					return nil
 				}
 
-				let producer = signalProducer(from: racSignal).map { $0 as! Int }
+				let producer = bridgedSignalProducer(from: racSignal).map { $0 as! Int }
 
 				expect((producer.single())?.value) == 0
 				expect((producer.single())?.value) == 1
@@ -81,7 +81,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				let error = TestError.default as NSError
 
 				let racSignal = RACSignal<AnyObject>.error(error)
-				let producer = signalProducer(from: racSignal)
+				let producer = bridgedSignalProducer(from: racSignal)
 				let result = producer.last()
 
 				expect(result?.error) == error
@@ -231,8 +231,8 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				command.enabled.subscribeNext { enabled = $0 as! Bool }
 				expect(enabled) == true
 
-				let values = signalProducer(from: command.executionSignals)
-					.map { signalProducer(from: $0!) }
+				let values = bridgedSignalProducer(from: command.executionSignals)
+					.map { bridgedSignalProducer(from: $0!) }
 					.flatten(.concat)
 
 				values.startWithResult { results.append($0.value as! Int) }

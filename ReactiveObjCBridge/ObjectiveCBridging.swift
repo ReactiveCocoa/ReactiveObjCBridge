@@ -119,7 +119,7 @@ private func defaultNSError(_ message: String, file: String, line: Int) -> NSErr
 ///   - line: Current line in file.
 ///
 /// - returns: Signal producer created from the provided signal.
-public func signalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, NSError> {
+public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, NSError> {
 	return SignalProducer<Value?, NSError> { observer, disposable in
 		let next: (_ value: Value?) -> Void = { obj in
 			observer.send(value: obj)
@@ -282,14 +282,14 @@ extension ActionProtocol {
 public func bridgedAction<Input, Output>(from command: RACCommand<Input, Output>, file: String = #file, line: Int = #line) -> Action<Input?, Output?, NSError> {
 	let enabledProperty = MutableProperty(true)
 
-	enabledProperty <~ signalProducer(from: command.enabled)
+	enabledProperty <~ bridgedSignalProducer(from: command.enabled)
 		.map { $0 as! Bool }
 		.flatMapError { _ in SignalProducer<Bool, NoError>(value: false) }
 
 	return Action<Input?, Output?, NSError>(enabledIf: enabledProperty) { input -> SignalProducer<Output?, NSError> in
 		let signal: RACSignal<Output> = command.execute(input)
 
-		return signalProducer(from: signal)
+		return bridgedSignalProducer(from: signal)
 	}
 }
 
