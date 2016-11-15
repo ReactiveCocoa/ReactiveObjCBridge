@@ -172,16 +172,16 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					}
 					let racSignal = producer.toRACSignal()
 
-					expect(racSignal.first() as? NSNumber) == 0
-					expect(racSignal.first() as? NSNumber) == 1
-					expect(racSignal.first() as? NSNumber) == 2
+					expect(racSignal.first()) == 0
+					expect(racSignal.first()) == 1
+					expect(racSignal.first()) == 2
 				}
 
 				it("should convert errors to NSError") {
 					let producer = SignalProducer<AnyObject, TestError>(error: .error1)
 					let racSignal = producer.toRACSignal().materialize()
 
-					let event = racSignal.first() as? RACEvent
+					let event = racSignal.first()
 					expect(event?.error as? NSError) == TestError.error1 as NSError
 				}
 				
@@ -189,7 +189,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					let producer = SignalProducer<AnyObject, NSError>(error: testNSError)
 					let racSignal = producer.toRACSignal().materialize()
 					
-					let event = racSignal.first() as? RACEvent
+					let event = racSignal.first()
 					let userInfoValue = event?.error?.localizedDescription
 					expect(userInfoValue) == userInfo[key]
 				}

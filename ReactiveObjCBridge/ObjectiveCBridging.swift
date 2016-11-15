@@ -44,7 +44,7 @@ extension RACScheduler: DateSchedulerProtocol {
 	///            begins.
 	@discardableResult
 	public func schedule(_ action: @escaping () -> Void) -> Disposable? {
-		let disposable: RACDisposable = self.schedule(action) // Call the Objective-C implementation
+		let disposable: RACDisposable? = self.schedule(action) // Call the Objective-C implementation
 		return disposable as Disposable?
 	}
 
