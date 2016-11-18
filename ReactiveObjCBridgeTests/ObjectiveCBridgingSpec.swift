@@ -369,17 +369,17 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				var action: Action<Optional<AnyObject>, NSString, TestError>!
 				var command: RACCommand<AnyObject, NSString>!
 
-				let enabledSubject = RACSubject()
+				let inputSubject = RACSubject()
 
-				let enabledSignal = RACSignal<NSNumber>
+				let inputSignal = RACSignal<NSNumber>
 					.createSignal({ subscriber in
-						return enabledSubject.subscribe(subscriber)
+						return inputSubject.subscribe(subscriber)
 					})
 					.replay()
 					.materialize()
 
 				action = Action() { input in
-					enabledSubject.sendNext(input)
+					inputSubject.sendNext(input)
 					return SignalProducer(value: "result")
 				}
 
@@ -388,7 +388,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				command.execute(Optional<AnyObject>.none)
 
-				let event = try! enabledSignal.asynchronousFirstOrDefault(nil, success: nil)
+				let event = try! inputSignal.asynchronousFirstOrDefault(nil, success: nil)
 				expect(event.value).to(beNil())
 			}
 		}
