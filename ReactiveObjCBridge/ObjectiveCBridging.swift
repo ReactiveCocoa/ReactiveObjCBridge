@@ -166,7 +166,7 @@ extension SignalProducerProtocol where Value: AnyObject {
 	}
 }
 
-extension SignalProducerProtocol where Self.Value: OptionalProtocol {
+extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject {
 	/// Create a `RACSignal` that will `start()` the producer once for each
 	/// subscription.
 	///
@@ -176,8 +176,8 @@ extension SignalProducerProtocol where Self.Value: OptionalProtocol {
 	///         See ReactiveObjCBridge#5 for more details.
 	///
 	/// - returns: `RACSignal` instantiated from `self`.
-	public func toRACSignal() -> RACSignal {
-		return RACSignal.createSignal { subscriber in
+	public func toRACSignal() -> RACSignal<Value.Wrapped> {
+		return RACSignal<Value.Wrapped>.createSignal { subscriber in
 			let selfDisposable = self.start { event in
 				switch event {
 				case let .value(value):
@@ -226,7 +226,7 @@ extension SignalProtocol where Value: AnyObject {
 	}
 }
 
-extension SignalProtocol where Self.Value: OptionalProtocol {
+extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject {
 	/// Create a `RACSignal` that will observe the given signal.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
@@ -235,8 +235,8 @@ extension SignalProtocol where Self.Value: OptionalProtocol {
 	///         See ReactiveObjCBridge#5 for more details.
 	///
 	/// - returns: `RACSignal` instantiated from `self`.
-	public func toRACSignal() -> RACSignal {
-		return RACSignal.createSignal { subscriber in
+	public func toRACSignal() -> RACSignal<Value.Wrapped> {
+		return RACSignal<Value.Wrapped>.createSignal { subscriber in
 			let selfDisposable = self.observe { event in
 				switch event {
 				case let .value(value):
@@ -319,6 +319,40 @@ extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject
 	/// - returns: `RACCommand` with bound action.
 	public func toRACCommand() -> RACCommand<Input.Wrapped, Output> {
 		return RACCommand<Input.Wrapped, Output>(enabled: action.isCommandEnabled) { input -> RACSignal<Output> in
+			return self
+				.apply(Input(reconstructing: input))
+				.toRACSignal()
+		}
+	}
+}
+
+extension ActionProtocol where Input: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
+	/// Creates a RACCommand that will execute the action.
+	///
+	/// - note: The returned command will not necessarily be marked as executing
+	///         when the action is. However, the reverse is always true: the Action
+	///         will always be marked as executing when the RACCommand is.
+	///
+	/// - returns: `RACCommand` with bound action.
+	public func toRACCommand() -> RACCommand<Input, Output.Wrapped> {
+		return RACCommand<Input, Output.Wrapped>(enabled: action.isCommandEnabled) { input -> RACSignal<Output.Wrapped> in
+			return self
+				.apply(input!)
+				.toRACSignal()
+		}
+	}
+}
+
+extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
+	/// Creates a RACCommand that will execute the action.
+	///
+	/// - note: The returned command will not necessarily be marked as executing
+	///         when the action is. However, the reverse is always true: the Action
+	///         will always be marked as executing when the RACCommand is.
+	///
+	/// - returns: `RACCommand` with bound action.
+	public func toRACCommand() -> RACCommand<Input.Wrapped, Output.Wrapped> {
+		return RACCommand<Input.Wrapped, Output.Wrapped>(enabled: action.isCommandEnabled) { input -> RACSignal<Output.Wrapped> in
 			return self
 				.apply(Input(reconstructing: input))
 				.toRACSignal()

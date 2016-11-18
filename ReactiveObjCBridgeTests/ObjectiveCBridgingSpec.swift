@@ -151,10 +151,13 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				}
 				
 				it("should bridge next events with value Optional<Any>.none to nil in Objective-C") {
-					let producer = SignalProducer<Optional<Any>, NSError>(value: nil)
-					let racSignal = producer.toRACSignal().materialize()
+					let (signal, observer) = Signal<Optional<AnyObject>, NSError>.pipe()
+					let racSignal = signal.toRACSignal().replay().materialize()
+
+					observer.send(value: nil)
+					observer.sendCompleted()
 					
-					let event = racSignal.first() as? RACEvent
+					let event = racSignal.first()
 					expect(event?.value).to(beNil())
 				}
 			}
@@ -194,11 +197,11 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					expect(userInfoValue) == userInfo[key]
 				}
 				
-				it("should bridge next events with value Optional<Any>.none to nil in Objective-C") {
-					let producer = SignalProducer<Optional<Any>, NSError>(value: nil)
+				it("should bridge next events with value Optional<AnyObject>.none to nil in Objective-C") {
+					let producer = SignalProducer<Optional<AnyObject>, NSError>(value: nil)
 					let racSignal = producer.toRACSignal().materialize()
 					
-					let event = racSignal.first() as? RACEvent
+					let event = racSignal.first()
 					expect(event?.value).to(beNil())
 				}
 			}
@@ -271,12 +274,12 @@ class ObjectiveCBridgingSpec: QuickSpec {
 		}
 
 		describe("toRACCommand") {
-			var action: Action<AnyObject?, NSString, TestError>!
+			var action: Action<NSNumber, NSString, TestError>!
 			var results: [NSString] = []
 
 			var enabledProperty: MutableProperty<Bool>!
 
-			var command: RACCommand<AnyObject, NSString>!
+			var command: RACCommand<NSNumber, NSString>!
 			var enabled = false
 			
 			beforeEach {
@@ -284,7 +287,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				enabledProperty = MutableProperty(true)
 
 				action = Action(enabledIf: enabledProperty) { input in
-					let inputNumber = input as! Int
+					let inputNumber = input as Int
 					return SignalProducer(value: "\(inputNumber + 1)" as NSString)
 				}
 
@@ -308,7 +311,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			}
 
 			it("should apply and start a signal once per execution") {
-				let signal = command.execute(0 as NSNumber)
+				let signal = command.execute(0)
 
 				do {
 					try signal.asynchronouslyWaitUntilCompleted()
@@ -323,19 +326,83 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					XCTFail("Failed to wait for completion")
 				}
 			}
+
+			it("should bridge both inputs and ouputs with Optional<AnyObject>.none to nil in Objective-C") {
+				var action: Action<Optional<AnyObject>, Optional<AnyObject>, TestError>!
+				var command: RACCommand<AnyObject, AnyObject>!
+
+				action = Action() { input in
+					return SignalProducer(value: input)
+				}
+
+				command = action.toRACCommand()
+				expect(command).notTo(beNil())
+
+				let racSignal = command.executionSignals.flatten().materialize().replay()
+
+				command.execute(Optional<AnyObject>.none)
+
+				let event = try! racSignal.asynchronousFirstOrDefault(nil, success: nil)
+				expect(event.value).to(beNil())
+			}
+
+			it("should bridge outputs with Optional<AnyObject>.none to nil in Objective-C") {
+				var action: Action<NSString, Optional<AnyObject>, TestError>!
+				var command: RACCommand<NSString, AnyObject>!
+
+				action = Action() { input in
+					return SignalProducer(value: Optional<AnyObject>.none)
+				}
+
+				command = action.toRACCommand()
+				expect(command).notTo(beNil())
+
+				let racSignal = command.executionSignals.flatten().materialize().replay()
+
+				command.execute("input" as NSString)
+
+				let event = try! racSignal.asynchronousFirstOrDefault(nil, success: nil)
+				expect(event.value).to(beNil())
+			}
+
+			it("should bridge inputs with Optional<AnyObject>.none to nil in Objective-C") {
+				var action: Action<Optional<AnyObject>, NSString, TestError>!
+				var command: RACCommand<AnyObject, NSString>!
+
+				let enabledSubject = RACSubject()
+
+				let enabledSignal = RACSignal<NSNumber>
+					.createSignal({ subscriber in
+						return enabledSubject.subscribe(subscriber)
+					})
+					.replay()
+					.materialize()
+
+				action = Action() { input in
+					enabledSubject.sendNext(input)
+					return SignalProducer(value: "result")
+				}
+
+				command = action.toRACCommand()
+				expect(command).notTo(beNil())
+
+				command.execute(Optional<AnyObject>.none)
+
+				let event = try! enabledSignal.asynchronousFirstOrDefault(nil, success: nil)
+				expect(event.value).to(beNil())
+			}
 		}
 		
 		describe("RACSubscriber.sendNext") {
-			
 			it("should have an argument of type Optional.none represented as `nil`") {
-				let racSignal = RACSignal.createSignal { subscriber in
-					subscriber.sendNext(Optional<Any>.none)
+				let racSignal = RACSignal<AnyObject>.createSignal { subscriber in
+					subscriber.sendNext(Optional<AnyObject>.none)
 					subscriber.sendCompleted()
 					return nil
 				}
 				
-				let event = racSignal.first() as? RACEvent
-				let value = event?.value
+				let event = try! racSignal.materialize().asynchronousFirstOrDefault(nil, success: nil)
+				let value = event.value
 				expect(value).to(beNil())
 			}
 		}
