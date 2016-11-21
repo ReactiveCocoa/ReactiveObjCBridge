@@ -225,8 +225,8 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				})
 
 				command = RACCommand<NSNumber, NSNumber>(enabled: enabledSignal) { input in
-					let inputNumber = input as! Int
-					return RACSignal<NSNumber>.`return`(inputNumber + 1)
+					let inputNumber = input as! Int + 1
+					return RACSignal<NSNumber>.`return`(inputNumber as NSNumber)
 				}
 
 				expect(command).notTo(beNil())
