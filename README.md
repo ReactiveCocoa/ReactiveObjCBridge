@@ -4,7 +4,9 @@ After announced Swift, ReactiveCocoa was rewritten in Swift. This framework
 creates a bridge between those Swift and Objective-C APIs ([ReactiveSwift][]
 and [ReactiveObjC][]).
 
-Because the APIs are based on fundamentally different designs, the conversion is not always one-to-one; however, every attempt has been made to faithfully translate the concepts between the two APIs (and languages).
+Because the APIs are based on fundamentally different designs, the conversion is
+not always one-to-one; however, every attempt has been made to faithfully
+translate the concepts between the two APIs (and languages).
 
 The bridged types include:
 
@@ -17,58 +19,94 @@ For the complete bridging API, including documentation, see [`ObjectiveCBridging
 
 ## `RACSignal` and `SignalProducer` or `Signal`
 
-In RAC 3, “cold” signals are represented by the `SignalProducer` type, and “hot” signals are represented by the `Signal` type.
+In ReactiveSwift, “cold” signals are represented by the `SignalProducer` type,
+and “hot” signals are represented by the `Signal` type.
 
-“Cold” `RACSignal`s can be converted into `SignalProducer`s using the new `toSignalProducer` method:
+“Cold” `RACSignal`s can be converted into `SignalProducer`s using the
+`bridgedSignalProducer()` free function:
 
 ```swift
-extension RACSignal {
-	func toSignalProducer() -> SignalProducer<AnyObject?, NSError>
+func bridgedSignalProducer<T>(from signal: RACSignal<T>) -> SignalProducer<T?, NSError>
+```
+
+“Hot” `RACSignal`s cannot be directly converted into `Signal`s, because _any_
+`RACSignal` subscription could potentially involve side effects. To obtain a
+`Signal`, use `RACSignal.toSignalProducer` followed by `SignalProducer.start`,
+which will make those potential side effects explicit.
+
+For the other direction, use the `toRACSignal()` instance method.
+
+When invoked on a `SignalProducer`, these functions will create a `RACSignal` to
+ `start()` the producer once for each subscription:
+
+```swift
+extension SignalProducerProtocol where Value: AnyObject {
+    func toRACSignal() -> RACSignal<Value>
 }
+
+extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject {
+	func toRACSignal() -> RACSignal<Value.Wrapped>
+}
+
 ```
 
-“Hot” `RACSignal`s cannot be directly converted into `Signal`s, because _any_ `RACSignal` subscription could potentially involve side effects. To obtain a `Signal`, use `RACSignal.toSignalProducer` followed by `SignalProducer.start`, which will make those potential side effects explicit.
-
-For the other direction, use the `toRACSignal()` function.
-
-When called with a `SignalProducer`, these functions will create a `RACSignal` to `start()` the producer once for each subscription:
+When inoked on a `Signal`, these methods will create a `RACSignal` that simply
+observes it:
 
 ```swift
-func toRACSignal<T: AnyObject, E>(producer: SignalProducer<T, E>) -> RACSignal
-func toRACSignal<T: AnyObject, E>(producer: SignalProducer<T?, E>) -> RACSignal
-```
+extension SignalProtocol where Value: AnyObject {
+    func toRACSignal() -> RACSignal<Value.Wrapped> {
+}
 
-When called with a `Signal`, these functions will create a `RACSignal` that simply observes it:
-
-```swift
-func toRACSignal<T: AnyObject, E>(signal: Signal<T, E>) -> RACSignal
-func toRACSignal<T: AnyObject, E>(signal: Signal<T?, E>) -> RACSignal
+extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject {
+    func toRACSignal() -> RACSignal<Value.Wrapped> {
+}
 ```
 
 ## `RACCommand` and `Action`
 
-To convert `RACCommand`s into the new `Action` type, use the `toAction()` extension method:
+To convert `RACCommand`s into the new `Action` type, use the `bridgedAction()`
+free function:
 
 ```swift
-extension RACCommand {
-	func toAction() -> Action<AnyObject?, AnyObject?, NSError>
+func bridgedAction<I, O>(from command: RACCommand<I, O>) -> Action<I?, O?, NSError>
+```
+
+To convert `Action`s into `RACCommand`s, use the `toRACCommand()` instance
+method:
+
+```swift
+extension ActionProtocol where Input: AnyObject, Output: AnyObject {
+	func toRACCommand() -> RACCommand<Input, Output>
+}
+
+extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: AnyObject {
+	func toRACCommand() -> RACCommand<Input.Wrapped, Output>
+}
+
+extension ActionProtocol where Input: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
+	func toRACCommand() -> RACCommand<Input, Output.Wrapped>
+}
+
+extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
+	func toRACCommand() -> RACCommand<Input.Wrapped, Output.Wrapped>
 }
 ```
 
-To convert `Action`s into `RACCommand`s, use the `toRACCommand()` function:
-
-```swift
-func toRACCommand<Output: AnyObject, E>(action: Action<AnyObject, Output, E>) -> RACCommand
-func toRACCommand<Output: AnyObject, E>(action: Action<AnyObject?, Output, E>) -> RACCommand
-```
-
-**NOTE:** The `executing` properties of actions and commands are not synchronized across the API bridge. To ensure consistency, only observe the `executing` property from the base object (the one passed _into_ the bridge, not retrieved from it), so updates occur no matter which object is used for execution.
+**NOTE:** The `executing` properties of actions and commands are not
+synchronized across the API bridge. To ensure consistency, only observe the
+`executing` property from the base object (the one passed _into_ the bridge, not
+retrieved from it), so updates occur no matter which object is used for
+execution.
 
 ## `RACScheduler` and `SchedulerType`
 
-Any `RACScheduler` instance is automatically a `DateSchedulerType` (and therefore a `SchedulerType`), and can be passed directly into any function or method that expects one.
+Any `RACScheduler` instance is automatically a `DateSchedulerType` (and
+therefore a `SchedulerType`), and can be passed directly into any function or
+method that expects one.
 
-Some (but not all) `SchedulerType`s from RAC 3 can be converted into `RACScheduler` instances, using the `toRACScheduler()` method:
+Some (but not all) `SchedulerType`s from RAC 3 can be converted into
+`RACScheduler` instances, using the `toRACScheduler()` method:
 
 ```swift
 extension ImmediateScheduler {
@@ -86,9 +124,11 @@ extension QueueScheduler {
 
 ## `RACDisposable` and `Disposable`
 
-Any `RACDisposable` instance is automatically a `Disposable`, and can be used directly anywhere a type conforming to `Disposable` is expected.
+Any `RACDisposable` instance is automatically a `Disposable`, and can be used
+ directly anywhere a type conforming to `Disposable` is expected.
 
-Although there is no direct conversion from `Disposable` into `RACDisposable`, it is easy to do manually:
+Although there is no direct conversion from `Disposable` into `RACDisposable`,
+it is easy to do manually:
 
 ```swift
 let swiftDisposable: Disposable

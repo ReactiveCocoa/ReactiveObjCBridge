@@ -44,7 +44,7 @@ extension RACScheduler: DateSchedulerProtocol {
 	///            begins.
 	@discardableResult
 	public func schedule(_ action: @escaping () -> Void) -> Disposable? {
-		let disposable: RACDisposable = self.schedule(action) // Call the Objective-C implementation
+		let disposable: RACDisposable? = self.schedule(action) // Call the Objective-C implementation
 		return disposable as Disposable?
 	}
 
@@ -110,43 +110,42 @@ private func defaultNSError(_ message: String, file: String, line: Int) -> NSErr
 	return Result<(), NSError>.error(message, file: file, line: line)
 }
 
-extension RACSignal {
-	/// Create a `SignalProducer` which will subscribe to the receiver once for
-	/// each invocation of `start()`.
-	///
-	/// - parameters:
-	///   - file: Current file name.
-	///   - line: Current line in file.
-	///
-	/// - returns: Signal producer created from `self`.
-	public func toSignalProducer(file: String = #file, line: Int = #line) -> SignalProducer<Any?, NSError> {
-		return SignalProducer { observer, disposable in
-			let next = { obj in
-				observer.send(value: obj)
-			}
-
-			let failed: (_ nsError: Swift.Error?) -> () = {
-				observer.send(error: ($0 as? NSError) ?? defaultNSError("Nil RACSignal error", file: file, line: line))
-			}
-
-			let completed = {
-				observer.sendCompleted()
-			}
-
-			disposable += self.subscribeNext(next, error: failed, completed: completed)
+/// Create a `SignalProducer` which will subscribe to the provided signal once
+/// for each invocation of `start()`.
+///
+/// - parameters:
+///   - signal: The signal to bridge to a signal producer.
+///   - file: Current file name.
+///   - line: Current line in file.
+///
+/// - returns: Signal producer created from the provided signal.
+public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, NSError> {
+	return SignalProducer<Value?, NSError> { observer, disposable in
+		let next: (_ value: Value?) -> Void = { obj in
+			observer.send(value: obj)
 		}
+
+		let failed: (_ nsError: Swift.Error?) -> () = {
+			observer.send(error: ($0 as? NSError) ?? defaultNSError("Nil RACSignal error", file: file, line: line))
+		}
+
+		let completed = {
+			observer.sendCompleted()
+		}
+
+		disposable += signal.subscribeNext(next, error: failed, completed: completed)
 	}
 }
 
-extension SignalProducerProtocol {
+extension SignalProducerProtocol where Value: AnyObject {
 	/// Create a `RACSignal` that will `start()` the producer once for each
 	/// subscription.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
 	///
 	/// - returns: `RACSignal` instantiated from `self`.
-	public func toRACSignal() -> RACSignal {
-		return RACSignal.createSignal { subscriber in
+	public func toRACSignal() -> RACSignal<Value> {
+		return RACSignal<Value>.createSignal { subscriber in
 			let selfDisposable = self.start { event in
 				switch event {
 				case let .value(value):
@@ -167,7 +166,7 @@ extension SignalProducerProtocol {
 	}
 }
 
-extension SignalProducerProtocol where Self.Value: OptionalProtocol {
+extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject {
 	/// Create a `RACSignal` that will `start()` the producer once for each
 	/// subscription.
 	///
@@ -177,8 +176,8 @@ extension SignalProducerProtocol where Self.Value: OptionalProtocol {
 	///         See ReactiveObjCBridge#5 for more details.
 	///
 	/// - returns: `RACSignal` instantiated from `self`.
-	public func toRACSignal() -> RACSignal {
-		return RACSignal.createSignal { subscriber in
+	public func toRACSignal() -> RACSignal<Value.Wrapped> {
+		return RACSignal<Value.Wrapped>.createSignal { subscriber in
 			let selfDisposable = self.start { event in
 				switch event {
 				case let .value(value):
@@ -199,14 +198,14 @@ extension SignalProducerProtocol where Self.Value: OptionalProtocol {
 	}
 }
 
-extension SignalProtocol {
+extension SignalProtocol where Value: AnyObject {
 	/// Create a `RACSignal` that will observe the given signal.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
 	///
 	/// - returns: `RACSignal` instantiated from `self`.
-	public func toRACSignal() -> RACSignal {
-		return RACSignal.createSignal { subscriber in
+	public func toRACSignal() -> RACSignal<Value> {
+		return RACSignal<Value>.createSignal { subscriber in
 			let selfDisposable = self.observe { event in
 				switch event {
 				case let .value(value):
@@ -227,7 +226,7 @@ extension SignalProtocol {
 	}
 }
 
-extension SignalProtocol where Self.Value: OptionalProtocol {
+extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject {
 	/// Create a `RACSignal` that will observe the given signal.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
@@ -236,8 +235,8 @@ extension SignalProtocol where Self.Value: OptionalProtocol {
 	///         See ReactiveObjCBridge#5 for more details.
 	///
 	/// - returns: `RACSignal` instantiated from `self`.
-	public func toRACSignal() -> RACSignal {
-		return RACSignal.createSignal { subscriber in
+	public func toRACSignal() -> RACSignal<Value.Wrapped> {
+		return RACSignal<Value.Wrapped>.createSignal { subscriber in
 			let selfDisposable = self.observe { event in
 				switch event {
 				case let .value(value):
@@ -260,37 +259,8 @@ extension SignalProtocol where Self.Value: OptionalProtocol {
 
 // MARK: -
 
-// FIXME: Reintroduce `RACCommand.toAction` when compiler no longer segfault
-//        on extensions to parameterized ObjC classes.
-/**
-extension RACCommand {
-	/// Creates an Action that will execute the receiver.
-	///
-	/// - note: The returned Action will not necessarily be marked as executing
-	///         when the command is. However, the reverse is always true: the
-	///         RACCommand will always be marked as executing when the action
-	///         is.
-	///
-	/// - parameters:
-	///   - file: Current file name.
-	///   - line: Current line in file.
-	///
-	/// - returns: Action created from `self`.
-	public func toAction(file: String = #file, line: Int = #line) -> Action<Any?, Any?, NSError> {
-		let enabledProperty = MutableProperty(true)
-
-		enabledProperty <~ self.enabled.toSignalProducer()
-			.map { $0 as! Bool }
-			.flatMapError { _ in SignalProducer<Bool, NoError>(value: false) }
-
-		return Action(enabledIf: enabledProperty) { input -> SignalProducer<Any?, NSError> in
-			let executionSignal = RACSignal.`defer` {
-				return self.execute(input)
-			}
-**/
-
 extension ActionProtocol {
-	fileprivate var isCommandEnabled: RACSignal {
+	fileprivate var isCommandEnabled: RACSignal<NSNumber> {
 		return self.isEnabled.producer
 			.map { $0 as NSNumber }
 			.toRACSignal()
@@ -309,24 +279,21 @@ extension ActionProtocol {
 ///   - line: Current line in file.
 ///
 /// - returns: Action created from `self`.
-public func bridgedAction<Input>(from command: RACCommand<Input>, file: String = #file, line: Int = #line) -> Action<Any?, Any?, NSError> {
-	let command = command as! RACCommand<AnyObject>
+public func bridgedAction<Input, Output>(from command: RACCommand<Input, Output>, file: String = #file, line: Int = #line) -> Action<Input?, Output?, NSError> {
 	let enabledProperty = MutableProperty(true)
 
-	enabledProperty <~ command.enabled.toSignalProducer()
+	enabledProperty <~ bridgedSignalProducer(from: command.enabled)
 		.map { $0 as! Bool }
 		.flatMapError { _ in SignalProducer<Bool, NoError>(value: false) }
 
-	return Action(enabledIf: enabledProperty) { input -> SignalProducer<Any?, NSError> in
-		let executionSignal = RACSignal.`defer` {
-			return command.execute(input as AnyObject?)
-		}
+	return Action<Input?, Output?, NSError>(enabledIf: enabledProperty) { input -> SignalProducer<Output?, NSError> in
+		let signal: RACSignal<Output> = command.execute(input)
 
-		return executionSignal.toSignalProducer(file: file, line: line)
+		return bridgedSignalProducer(from: signal)
 	}
 }
 
-extension ActionProtocol where Input: AnyObject {
+extension ActionProtocol where Input: AnyObject, Output: AnyObject {
 	/// Creates a RACCommand that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
@@ -334,8 +301,41 @@ extension ActionProtocol where Input: AnyObject {
 	///         will always be marked as executing when the RACCommand is.
 	///
 	/// - returns: `RACCommand` with bound action.
-	public func toRACCommand() -> RACCommand<Input> {
-		return RACCommand<Input>(enabled: action.isCommandEnabled) { input -> RACSignal in
+	public func toRACCommand() -> RACCommand<Input, Output> {
+		return RACCommand<Input, Output>(enabled: action.isCommandEnabled) { input -> RACSignal<Output> in
+			return self.apply(input!)
+				.toRACSignal()
+		}
+	}
+}
+
+extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: AnyObject {
+	/// Creates a RACCommand that will execute the action.
+	///
+	/// - note: The returned command will not necessarily be marked as executing
+	///         when the action is. However, the reverse is always true: the Action
+	///         will always be marked as executing when the RACCommand is.
+	///
+	/// - returns: `RACCommand` with bound action.
+	public func toRACCommand() -> RACCommand<Input.Wrapped, Output> {
+		return RACCommand<Input.Wrapped, Output>(enabled: action.isCommandEnabled) { input -> RACSignal<Output> in
+			return self
+				.apply(Input(reconstructing: input))
+				.toRACSignal()
+		}
+	}
+}
+
+extension ActionProtocol where Input: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
+	/// Creates a RACCommand that will execute the action.
+	///
+	/// - note: The returned command will not necessarily be marked as executing
+	///         when the action is. However, the reverse is always true: the Action
+	///         will always be marked as executing when the RACCommand is.
+	///
+	/// - returns: `RACCommand` with bound action.
+	public func toRACCommand() -> RACCommand<Input, Output.Wrapped> {
+		return RACCommand<Input, Output.Wrapped>(enabled: action.isCommandEnabled) { input -> RACSignal<Output.Wrapped> in
 			return self
 				.apply(input!)
 				.toRACSignal()
@@ -343,7 +343,7 @@ extension ActionProtocol where Input: AnyObject {
 	}
 }
 
-extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject {
+extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
 	/// Creates a RACCommand that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
@@ -351,8 +351,8 @@ extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject
 	///         will always be marked as executing when the RACCommand is.
 	///
 	/// - returns: `RACCommand` with bound action.
-	public func toRACCommand() -> RACCommand<Input.Wrapped> {
-		return RACCommand<Input.Wrapped>(enabled: action.isCommandEnabled) { input -> RACSignal in
+	public func toRACCommand() -> RACCommand<Input.Wrapped, Output.Wrapped> {
+		return RACCommand<Input.Wrapped, Output.Wrapped>(enabled: action.isCommandEnabled) { input -> RACSignal<Output.Wrapped> in
 			return self
 				.apply(Input(reconstructing: input))
 				.toRACSignal()
