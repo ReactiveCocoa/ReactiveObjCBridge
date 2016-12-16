@@ -73,8 +73,8 @@ extension RACScheduler: DateSchedulerProtocol {
 	/// - returns: Optional `Disposable` that can be used to cancel the work
 	///            before it begins.
 	@discardableResult
-	public func schedule(after date: Date, interval: TimeInterval, leeway: TimeInterval, action: @escaping () -> Void) -> Disposable? {
-		return self.after(date, repeatingEvery: interval, withLeeway: leeway, schedule: action)
+	public func schedule(after date: Date, interval: DispatchTimeInterval, leeway: DispatchTimeInterval, action: @escaping () -> Void) -> Disposable? {
+		return self.after(date, repeatingEvery: interval.timeInterval, withLeeway: leeway.timeInterval, schedule: action)
 	}
 }
 
@@ -356,6 +356,23 @@ extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject
 			return self
 				.apply(Input(reconstructing: input))
 				.toRACSignal()
+		}
+	}
+}
+
+// MARK: - Helpers
+
+extension DispatchTimeInterval {
+	fileprivate var timeInterval: TimeInterval {
+		switch self {
+		case let .seconds(s):
+			return TimeInterval(s)
+		case let .milliseconds(ms):
+			return TimeInterval(TimeInterval(ms) / 1000.0)
+		case let .microseconds(us):
+			return TimeInterval(UInt64(us) * NSEC_PER_USEC) / TimeInterval(NSEC_PER_SEC)
+		case let .nanoseconds(ns):
+			return TimeInterval(ns) / TimeInterval(NSEC_PER_SEC)
 		}
 	}
 }
