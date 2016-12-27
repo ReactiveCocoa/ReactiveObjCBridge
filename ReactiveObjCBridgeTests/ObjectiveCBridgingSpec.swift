@@ -78,13 +78,13 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			}
 
 			it("should forward errors")	{
-				let error = TestError.default as NSError
+				let error = TestError.default
 
 				let racSignal = RACSignal<AnyObject>.error(error)
 				let producer = bridgedSignalProducer(from: racSignal)
 				let result = producer.last()
 
-				expect(result?.error) == error
+				expect(result?.error) == AnyError(error)
 			}
 		}
 
@@ -214,7 +214,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			var enabledSubject: RACSubject!
 			var enabled = false
 
-			var action: Action<NSNumber?, NSNumber?, NSError>!
+			var action: Action<NSNumber?, NSNumber?, AnyError>!
 
 			beforeEach {
 				enabledSubject = RACSubject()
