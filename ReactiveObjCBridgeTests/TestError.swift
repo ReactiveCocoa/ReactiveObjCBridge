@@ -18,6 +18,13 @@ internal enum TestError: Int {
 extension TestError: Error {
 }
 
+extension AnyError: Equatable {
+	public static func ==(lhs: AnyError, rhs: AnyError) -> Bool {
+		return lhs.error._code == rhs.error._code
+			&& lhs.error._domain == rhs.error._domain
+	}
+}
+
 
 internal extension SignalProducerProtocol {
 	/// Halts if an error is emitted in the receiver signal.

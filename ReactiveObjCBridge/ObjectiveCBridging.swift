@@ -119,14 +119,14 @@ private func defaultNSError(_ message: String, file: String, line: Int) -> NSErr
 ///   - line: Current line in file.
 ///
 /// - returns: Signal producer created from the provided signal.
-public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, NSError> {
-	return SignalProducer<Value?, NSError> { observer, disposable in
+public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, AnyError> {
+	return SignalProducer<Value?, AnyError> { observer, disposable in
 		let next: (_ value: Value?) -> Void = { obj in
 			observer.send(value: obj)
 		}
 
-		let failed: (_ nsError: Swift.Error?) -> () = {
-			observer.send(error: ($0 as? NSError) ?? defaultNSError("Nil RACSignal error", file: file, line: line))
+		let failed: (_ error: Swift.Error?) -> () = { error in
+			observer.send(error: AnyError(error ?? defaultNSError("Nil RACSignal error", file: file, line: line)))
 		}
 
 		let completed = {
@@ -279,14 +279,14 @@ extension ActionProtocol {
 ///   - line: Current line in file.
 ///
 /// - returns: Action created from `self`.
-public func bridgedAction<Input, Output>(from command: RACCommand<Input, Output>, file: String = #file, line: Int = #line) -> Action<Input?, Output?, NSError> {
+public func bridgedAction<Input, Output>(from command: RACCommand<Input, Output>, file: String = #file, line: Int = #line) -> Action<Input?, Output?, AnyError> {
 	let enabledProperty = MutableProperty(true)
 
 	enabledProperty <~ bridgedSignalProducer(from: command.enabled)
 		.map { $0 as! Bool }
 		.flatMapError { _ in SignalProducer<Bool, NoError>(value: false) }
 
-	return Action<Input?, Output?, NSError>(enabledIf: enabledProperty) { input -> SignalProducer<Output?, NSError> in
+	return Action<Input?, Output?, AnyError>(enabledIf: enabledProperty) { input -> SignalProducer<Output?, AnyError> in
 		let signal: RACSignal<Output> = command.execute(input)
 
 		return bridgedSignalProducer(from: signal)
