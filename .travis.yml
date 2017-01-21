@@ -59,6 +59,11 @@ matrix:
         - carthage build --no-skip-current --platform watchOS
       env:
         - JOB=CARTHAGE-watchOS
+    - script:
+      - pod repo update --silent
+      - pod lib lint --allow-warnings
+      env:
+        - JOB=PODSPEC
 notifications:
   email: false
   slack:
