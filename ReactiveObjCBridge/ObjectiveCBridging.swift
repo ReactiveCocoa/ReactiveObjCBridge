@@ -26,7 +26,7 @@ extension SignalProducerProtocol {
 }
 
 extension RACDisposable: Disposable {}
-extension RACScheduler: DateSchedulerProtocol {
+extension RACScheduler: DateScheduler {
 	/// The current date, as determined by this scheduler.
 	public var currentDate: Date {
 		return Date()
