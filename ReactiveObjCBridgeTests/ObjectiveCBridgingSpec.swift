@@ -18,11 +18,11 @@ class ObjectiveCBridgingSpec: QuickSpec {
 	override func spec() {
 		describe("RACScheduler") {
 			var originalScheduler: RACTestScheduler!
-			var scheduler: DateSchedulerProtocol!
+			var scheduler: DateScheduler!
 
 			beforeEach {
 				originalScheduler = RACTestScheduler()
-				scheduler = originalScheduler as DateSchedulerProtocol
+				scheduler = originalScheduler as DateScheduler
 			}
 
 			it("gives current date") {
