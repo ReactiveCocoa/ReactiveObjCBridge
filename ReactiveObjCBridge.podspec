@@ -20,5 +20,5 @@ Pod::Spec.new do |s|
   s.source_files = "ReactiveObjCBridge/*.{swift}"
 
   s.dependency 'ReactiveObjC', '~> 2.1.2'
-  s.dependency 'ReactiveSwift', '~> 1.0'
+  s.dependency 'ReactiveSwift', '~> 1.1'
 end
