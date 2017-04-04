@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "ReactiveObjCBridge"
-  s.version      = "1.0.0"
+  s.version      = "1.0.1"
   s.summary      = "Bridge between ReactiveObjC and ReactiveSwift"
   s.description  = <<-DESC
                    After announced Swift, ReactiveCocoa was rewritten in Swift. This framework creates a bridge between those Swift and Objective-C APIs (ReactiveSwift and ReactiveObjC).
