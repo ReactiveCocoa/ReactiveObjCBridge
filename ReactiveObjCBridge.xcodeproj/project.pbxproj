@@ -482,7 +482,7 @@
 			dependencies = (
 			);
 			name = "ReactiveObjCBridge-tvOS";
-			productName = ReactiveCocoa;
+			productName = "ReactiveObjCBridge-tvOS";
 			productReference = 57A4D2411BA13D7A00F7D4B1 /* ReactiveObjCBridge.framework */;
 			productType = "com.apple.product-type.framework";
 		};
@@ -501,7 +501,7 @@
 				7DFBED0A1CDB8C9500EE435B /* PBXTargetDependency */,
 			);
 			name = "ReactiveObjCBridge-tvOSTests";
-			productName = "ReactiveCocoa-tvOSTests";
+			productName = "ReactiveObjCBridge-tvOSTests";
 			productReference = 7DFBED031CDB8C9500EE435B /* ReactiveObjCBridgeTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -519,7 +519,7 @@
 			dependencies = (
 			);
 			name = "ReactiveObjCBridge-watchOS";
-			productName = ReactiveCocoa;
+			productName = "ReactiveObjCBridge-watchOS";
 			productReference = A9B315541B3940610001CB9C /* ReactiveObjCBridge.framework */;
 			productType = "com.apple.product-type.framework";
 		};
@@ -537,7 +537,7 @@
 			dependencies = (
 			);
 			name = "ReactiveObjCBridge-macOS";
-			productName = ReactiveCocoa;
+			productName = "ReactiveObjCBridge-macOS";
 			productReference = D04725EA19E49ED7006002AA /* ReactiveObjCBridge.framework */;
 			productType = "com.apple.product-type.framework";
 		};
@@ -555,7 +555,7 @@
 				D04725F819E49ED7006002AA /* PBXTargetDependency */,
 			);
 			name = "ReactiveObjCBridge-macOSTests";
-			productName = ReactiveCocoaTests;
+			productName = "ReactiveObjCBridge-macOSTests";
 			productReference = D04725F519E49ED7006002AA /* ReactiveObjCBridgeTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -573,7 +573,7 @@
 			dependencies = (
 			);
 			name = "ReactiveObjCBridge-iOS";
-			productName = ReactiveCocoa;
+			productName = "ReactiveObjCBridge-iOS";
 			productReference = D047260C19E49F82006002AA /* ReactiveObjCBridge.framework */;
 			productType = "com.apple.product-type.framework";
 		};
@@ -592,7 +592,7 @@
 				D047261919E49F82006002AA /* PBXTargetDependency */,
 			);
 			name = "ReactiveObjCBridge-iOSTests";
-			productName = ReactiveCocoaTests;
+			productName = "ReactiveObjCBridge-iOSTests";
 			productReference = D047261619E49F82006002AA /* ReactiveObjCBridgeTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
