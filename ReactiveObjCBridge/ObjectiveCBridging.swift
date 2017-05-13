@@ -275,7 +275,7 @@ extension ActionProtocol {
 ///         is.
 ///
 /// - parameters:
-///	  - command: The command to bridge to an action.
+///   - command: The command to bridge to an action.
 ///   - file: Current file name.
 ///   - line: Current line in file.
 ///
