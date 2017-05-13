@@ -413,56 +413,6 @@ public func bridgedTuple<First, Second, Third, Fourth, Fifth>(from tuple: RACFiv
 	return (tuple.first, tuple.second, tuple.third, tuple.fourth, tuple.fifth)
 }
 
-/// Creates a RACOneTuple from a Swift tuple.
-///
-/// - parameters:
-///	  - tuple: The tuple to convert to a `RACOneTuple`.
-///
-/// - returns: `RACOneTuple` instantiated from given tuple.
-public func toRACTuple<First: AnyObject>(from tuple: (First)) -> RACOneTuple<First> {
-	return RACOneTuple.pack(tuple)
-}
-
-/// Creates a RACTwoTuple from a Swift tuple.
-///
-/// - parameters:
-///	  - tuple: The tuple to convert to a `RACTwoTuple`.
-///
-/// - returns: `RACTwoTuple` instantiated from given tuple.
-public func toRACTuple<First: AnyObject, Second: AnyObject>(from tuple: (First, Second)) -> RACTwoTuple<First, Second> {
-	return RACTwoTuple.pack(tuple.0, tuple.1)
-}
-
-/// Creates a RACThreeTuple from a Swift tuple.
-///
-/// - parameters:
-///	  - tuple: The tuple to convert to a `RACThreeTuple`.
-///
-/// - returns: `RACThreeTuple` instantiated from given tuple.
-public func toRACTuple<First: AnyObject, Second: AnyObject, Third: AnyObject>(from tuple: (First?, Second?, Third?)) -> RACThreeTuple<First, Second, Third> {
-	return RACThreeTuple.pack(tuple.0, tuple.1, tuple.2)
-}
-
-/// Creates a RACFourTuple from a Swift tuple.
-///
-/// - parameters:
-///	  - tuple: The tuple to convert to a `RACFourTuple`.
-///
-/// - returns: `RACFourTuple` instantiated from given tuple.
-public func toRACTuple<First: AnyObject, Second: AnyObject, Third: AnyObject, Fourth: AnyObject>(from tuple: (First?, Second?, Third?, Fourth?)) -> RACFourTuple<First, Second, Third, Fourth> {
-	return RACFourTuple.pack(tuple.0, tuple.1, tuple.2, tuple.3)
-}
-
-/// Creates a RACFiveTuple from a Swift tuple.
-///
-/// - parameters:
-///	  - tuple: The tuple to convert to a `RACFiveTuple`.
-///
-/// - returns: `RACFiveTuple` instantiated from given tuple.
-public func toRACTuple<First: AnyObject, Second: AnyObject, Third: AnyObject, Fourth: AnyObject, Fifth: AnyObject>(from tuple: (First?, Second?, Third?, Fourth?, Fifth?)) -> RACFiveTuple<First, Second, Third, Fourth, Fifth> {
-	return RACFiveTuple.pack(tuple.0, tuple.1, tuple.2, tuple.3, tuple.4)
-}
-
 // MARK: - Helpers
 
 extension DispatchTimeInterval {
