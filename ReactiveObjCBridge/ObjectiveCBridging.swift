@@ -361,6 +361,108 @@ extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject
 	}
 }
 
+// MARK: Tuples
+
+/// Creates a Swift tuple with one element.
+///
+/// - parameters:
+///   - tuple: The `RACOneTuple` to bridge to a Swift tuple.
+///
+/// - returns: Swift tuple created from the provided `RACOneTuple` object.
+public func bridgedTuple<First>(from tuple: RACOneTuple<First>) -> (First?) {
+	return (tuple.first)
+}
+
+/// Creates a Swift tuple with two elements.
+///
+/// - parameters:
+///   - tuple: The `RACTwoTuple` to bridge to a Swift tuple.
+///
+/// - returns: Swift tuple created from the provided `RACTwoTuple` object.
+public func bridgedTuple<First, Second>(from tuple: RACTwoTuple<First, Second>) -> (First?, Second?) {
+	return (tuple.first, tuple.second)
+}
+
+/// Creates a Swift tuple with three elements.
+///
+/// - parameters:
+///   - tuple: The `RACThreeTuple` to bridge to a Swift tuple.
+///
+/// - returns: Swift tuple created from the provided `RACThreeTuple` object.
+public func bridgedTuple<First, Second, Third>(from tuple: RACThreeTuple<First, Second, Third>) -> (First?, Second?, Third?) {
+	return (tuple.first, tuple.second, tuple.third)
+}
+
+/// Creates a Swift tuple with four elements.
+///
+/// - parameters:
+///   - tuple: The `RACFourTuple` to bridge to a Swift tuple.
+///
+/// - returns: Swift tuple created from the provided `RACFourTuple` object.
+public func bridgedTuple<First, Second, Third, Fourth>(from tuple: RACFourTuple<First, Second, Third, Fourth>) -> (First?, Second?, Third?, Fourth?) {
+	return (tuple.first, tuple.second, tuple.third, tuple.fourth)
+}
+
+/// Creates a Swift tuple with five elements.
+///
+/// - parameters:
+///   - tuple: The `RACFiveTuple` to bridge to a Swift tuple.
+///
+/// - returns: Swift tuple created from the provided `RACFiveTuple` object.
+public func bridgedTuple<First, Second, Third, Fourth, Fifth>(from tuple: RACFiveTuple<First, Second, Third, Fourth, Fifth>) -> (First?, Second?, Third?, Fourth?, Fifth?) {
+	return (tuple.first, tuple.second, tuple.third, tuple.fourth, tuple.fifth)
+}
+
+/// Creates a RACOneTuple from a Swift tuple.
+///
+/// - parameters:
+///	  - tuple: The tuple to convert to a `RACOneTuple`.
+///
+/// - returns: `RACOneTuple` instantiated from given tuple.
+public func toRACTuple<First: AnyObject>(from tuple: (First)) -> RACOneTuple<First> {
+	return RACOneTuple.pack(tuple)
+}
+
+/// Creates a RACTwoTuple from a Swift tuple.
+///
+/// - parameters:
+///	  - tuple: The tuple to convert to a `RACTwoTuple`.
+///
+/// - returns: `RACTwoTuple` instantiated from given tuple.
+public func toRACTuple<First: AnyObject, Second: AnyObject>(from tuple: (First, Second)) -> RACTwoTuple<First, Second> {
+	return RACTwoTuple.pack(tuple.0, tuple.1)
+}
+
+/// Creates a RACThreeTuple from a Swift tuple.
+///
+/// - parameters:
+///	  - tuple: The tuple to convert to a `RACThreeTuple`.
+///
+/// - returns: `RACThreeTuple` instantiated from given tuple.
+public func toRACTuple<First: AnyObject, Second: AnyObject, Third: AnyObject>(from tuple: (First?, Second?, Third?)) -> RACThreeTuple<First, Second, Third> {
+	return RACThreeTuple.pack(tuple.0, tuple.1, tuple.2)
+}
+
+/// Creates a RACFourTuple from a Swift tuple.
+///
+/// - parameters:
+///	  - tuple: The tuple to convert to a `RACFourTuple`.
+///
+/// - returns: `RACFourTuple` instantiated from given tuple.
+public func toRACTuple<First: AnyObject, Second: AnyObject, Third: AnyObject, Fourth: AnyObject>(from tuple: (First?, Second?, Third?, Fourth?)) -> RACFourTuple<First, Second, Third, Fourth> {
+	return RACFourTuple.pack(tuple.0, tuple.1, tuple.2, tuple.3)
+}
+
+/// Creates a RACFiveTuple from a Swift tuple.
+///
+/// - parameters:
+///	  - tuple: The tuple to convert to a `RACFiveTuple`.
+///
+/// - returns: `RACFiveTuple` instantiated from given tuple.
+public func toRACTuple<First: AnyObject, Second: AnyObject, Third: AnyObject, Fourth: AnyObject, Fifth: AnyObject>(from tuple: (First?, Second?, Third?, Fourth?, Fifth?)) -> RACFiveTuple<First, Second, Third, Fourth, Fifth> {
+	return RACFiveTuple.pack(tuple.0, tuple.1, tuple.2, tuple.3, tuple.4)
+}
+
 // MARK: - Helpers
 
 extension DispatchTimeInterval {
