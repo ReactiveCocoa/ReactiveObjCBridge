@@ -406,5 +406,76 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				expect(value).to(beNil())
 			}
 		}
+
+		describe("bridgedTuple") {
+			it("should bridge 1-tuples") {
+				let racTuple = RACOneTuple<NSNumber>.pack(0)
+				let tuple = bridgedTuple(from: racTuple)
+
+				expect(tuple) == (0)
+			}
+
+			it("should bridge 2-tuples") {
+				let racTuple = RACTwoTuple<NSNumber, NSNumber>.pack(0, 1)
+				let tuple = bridgedTuple(from: racTuple)
+
+				expect(Mirror(reflecting: tuple).children.count) == 2
+				expect(tuple.0) == 0
+				expect(tuple.1) == 1
+			}
+
+			it("should bridge 3-tuples") {
+				let racTuple = RACThreeTuple<NSNumber, NSNumber, NSNumber>.pack(0, 1, 2)
+				let tuple = bridgedTuple(from: racTuple)
+
+				expect(Mirror(reflecting: tuple).children.count) == 3
+				expect(tuple.0) == 0
+				expect(tuple.1) == 1
+				expect(tuple.2) == 2
+			}
+
+			it("should bridge 4-tuples") {
+				let racTuple = RACFourTuple<NSNumber, NSNumber, NSNumber, NSNumber>.pack(0, 1, 2, 3)
+				let tuple = bridgedTuple(from: racTuple)
+
+				expect(Mirror(reflecting: tuple).children.count) == 4
+				expect(tuple.0) == 0
+				expect(tuple.1) == 1
+				expect(tuple.2) == 2
+				expect(tuple.3) == 3
+			}
+
+			it("should bridge 5-tuples") {
+				let racTuple = RACFiveTuple<NSNumber, NSNumber, NSNumber, NSNumber, NSNumber>.pack(0, 1, 2, 3, 4)
+				let tuple = bridgedTuple(from: racTuple)
+
+				expect(Mirror(reflecting: tuple).children.count) == 5
+				expect(tuple.0) == 0
+				expect(tuple.1) == 1
+				expect(tuple.2) == 2
+				expect(tuple.3) == 3
+				expect(tuple.4) == 4
+			}
+
+			it("should bridge tuples containing nils") {
+				let racTuple = RACThreeTuple<NSString, NSString, NSString>.pack(nil, nil, nil)
+				let tuple = bridgedTuple(from: racTuple)
+
+				expect(Mirror(reflecting: tuple).children.count) == 3
+				expect(tuple.0).to(beNil())
+				expect(tuple.1).to(beNil())
+				expect(tuple.2).to(beNil())
+			}
+
+			it("should bridge tuples containing both nils and values") {
+				let racTuple = RACThreeTuple<NSString, NSString, NSString>.pack("rose", nil, "petal")
+				let tuple = bridgedTuple(from: racTuple)
+
+				expect(Mirror(reflecting: tuple).children.count) == 3
+				expect(tuple.0) == "rose"
+				expect(tuple.1).to(beNil())
+				expect(tuple.2) == "petal"
+			}
+		}
 	}
 }
