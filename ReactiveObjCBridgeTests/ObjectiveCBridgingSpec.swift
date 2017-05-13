@@ -211,7 +211,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			var command: RACCommand<NSNumber, NSNumber>!
 			var results: [Int] = []
 
-			var enabledSubject: RACSubject!
+			var enabledSubject: RACSubject<NSNumber>!
 			var enabled = false
 
 			var action: Action<NSNumber?, NSNumber?, AnyError>!
@@ -220,9 +220,9 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				enabledSubject = RACSubject()
 				results = []
 
-				let enabledSignal = RACSignal<NSNumber>.createSignal({ subscriber in
+				let enabledSignal = RACSignal<NSNumber>.createSignal { subscriber in
 					return enabledSubject.subscribe(subscriber)
-				})
+				}
 
 				command = RACCommand<NSNumber, NSNumber>(enabled: enabledSignal) { input in
 					let inputNumber = input as! Int + 1
@@ -369,12 +369,12 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				var action: Action<Optional<AnyObject>, NSString, TestError>!
 				var command: RACCommand<AnyObject, NSString>!
 
-				let inputSubject = RACSubject()
+				let inputSubject = RACSubject<AnyObject>()
 
 				let inputSignal = RACSignal<NSNumber>
-					.createSignal({ subscriber in
+					.createSignal { subscriber in
 						return inputSubject.subscribe(subscriber)
-					})
+					}
 					.replay()
 					.materialize()
 
