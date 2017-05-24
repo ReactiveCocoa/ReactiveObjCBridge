@@ -120,6 +120,10 @@ private func defaultNSError(_ message: String, file: String, line: Int) -> NSErr
 ///
 /// - returns: Signal producer created from the provided signal.
 public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, AnyError> {
+	return _bridgedSignalProducer(from: signal)
+}
+
+private func _bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, AnyError> {
 	return SignalProducer<Value?, AnyError> { observer, disposable in
 		let next: (_ value: Value?) -> Void = { obj in
 			observer.send(value: obj)
@@ -135,6 +139,71 @@ public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: St
 
 		disposable += signal.subscribeNext(next, error: failed, completed: completed)
 	}
+}
+
+/// Create a `SignalProducer` of 1-tuples which will subscribe to the provided
+/// signal once for each invocation of `start()`.
+///
+/// - parameters:
+///   - signal: The signal of `RACOneTuple` objects to bridge to a signal producer of 1-tuples.
+///   - file: Current file name.
+///   - line: Current line in file.
+///
+/// - returns: Signal producer created from the provided signal.
+public func bridgedSignalProducer<First>(from signal: RACSignal<RACOneTuple<First>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?)?, AnyError> {
+	return _bridgedSignalProducer(from: signal).map { $0.map(bridgedTuple) }
+}
+
+/// Create a `SignalProducer` of 2-tuples which will subscribe to the provided
+/// signal once for each invocation of `start()`.
+///
+/// - parameters:
+///   - signal: The signal of `RACTwoTuple` objects to bridge to a signal producer of 2-tuples.
+///   - file: Current file name.
+///   - line: Current line in file.
+///
+/// - returns: Signal producer created from the provided signal.
+public func bridgedSignalProducer<First, Second>(from signal: RACSignal<RACTwoTuple<First, Second>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?)?, AnyError> {
+	return _bridgedSignalProducer(from: signal).map { $0.map(bridgedTuple) }
+}
+
+/// Create a `SignalProducer` of 3-tuples which will subscribe to the provided
+/// signal once for each invocation of `start()`.
+///
+/// - parameters:
+///   - signal: The signal of `RACThreeTuple` objects to bridge to a signal producer of 3-tuples.
+///   - file: Current file name.
+///   - line: Current line in file.
+///
+/// - returns: Signal producer created from the provided signal.
+public func bridgedSignalProducer<First, Second, Third>(from signal: RACSignal<RACThreeTuple<First, Second, Third>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?, Third?)?, AnyError> {
+	return _bridgedSignalProducer(from: signal).map { $0.map(bridgedTuple) }
+}
+
+/// Create a `SignalProducer` of 4-tuples which will subscribe to the provided
+/// signal once for each invocation of `start()`.
+///
+/// - parameters:
+///   - signal: The signal of `RACFourTuple` objects to bridge to a signal producer of 4-tuples.
+///   - file: Current file name.
+///   - line: Current line in file.
+///
+/// - returns: Signal producer created from the provided signal.
+public func bridgedSignalProducer<First, Second, Third, Fourth>(from signal: RACSignal<RACFourTuple<First, Second, Third, Fourth>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?, Third?, Fourth?)?, AnyError> {
+	return _bridgedSignalProducer(from: signal).map { $0.map(bridgedTuple) }
+}
+
+/// Create a `SignalProducer` of 5-tuples which will subscribe to the provided
+/// signal once for each invocation of `start()`.
+///
+/// - parameters:
+///   - signal: The signal of `RACFiveTuple` objects to bridge to a signal producer of 5-tuples.
+///   - file: Current file name.
+///   - line: Current line in file.
+///
+/// - returns: Signal producer created from the provided signal.
+public func bridgedSignalProducer<First, Second, Third, Fourth, Fifth>(from signal: RACSignal<RACFiveTuple<First, Second, Third, Fourth, Fifth>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?, Third?, Fourth?, Fifth?)?, AnyError> {
+	return _bridgedSignalProducer(from: signal).map { $0.map(bridgedTuple) }
 }
 
 extension SignalProducerProtocol where Value: AnyObject {
