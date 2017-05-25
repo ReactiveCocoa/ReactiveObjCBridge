@@ -120,7 +120,7 @@ private func defaultNSError(_ message: String, file: String, line: Int) -> NSErr
 ///
 /// - returns: Signal producer created from the provided signal.
 public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, AnyError> {
-	return _bridgedSignalProducer(from: signal)
+	return _bridgedSignalProducer(from: signal, file: file, line: line)
 }
 
 private func _bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, AnyError> {
@@ -151,7 +151,7 @@ private func _bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: 
 ///
 /// - returns: Signal producer created from the provided signal.
 public func bridgedSignalProducer<First>(from signal: RACSignal<RACOneTuple<First>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?)?, AnyError> {
-	return _bridgedSignalProducer(from: signal).map { $0.map(bridgedTuple) }
+	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
 }
 
 /// Create a `SignalProducer` of 2-tuples which will subscribe to the provided
@@ -164,7 +164,7 @@ public func bridgedSignalProducer<First>(from signal: RACSignal<RACOneTuple<Firs
 ///
 /// - returns: Signal producer created from the provided signal.
 public func bridgedSignalProducer<First, Second>(from signal: RACSignal<RACTwoTuple<First, Second>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?)?, AnyError> {
-	return _bridgedSignalProducer(from: signal).map { $0.map(bridgedTuple) }
+	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
 }
 
 /// Create a `SignalProducer` of 3-tuples which will subscribe to the provided
@@ -177,7 +177,7 @@ public func bridgedSignalProducer<First, Second>(from signal: RACSignal<RACTwoTu
 ///
 /// - returns: Signal producer created from the provided signal.
 public func bridgedSignalProducer<First, Second, Third>(from signal: RACSignal<RACThreeTuple<First, Second, Third>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?, Third?)?, AnyError> {
-	return _bridgedSignalProducer(from: signal).map { $0.map(bridgedTuple) }
+	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
 }
 
 /// Create a `SignalProducer` of 4-tuples which will subscribe to the provided
@@ -190,7 +190,7 @@ public func bridgedSignalProducer<First, Second, Third>(from signal: RACSignal<R
 ///
 /// - returns: Signal producer created from the provided signal.
 public func bridgedSignalProducer<First, Second, Third, Fourth>(from signal: RACSignal<RACFourTuple<First, Second, Third, Fourth>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?, Third?, Fourth?)?, AnyError> {
-	return _bridgedSignalProducer(from: signal).map { $0.map(bridgedTuple) }
+	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
 }
 
 /// Create a `SignalProducer` of 5-tuples which will subscribe to the provided
@@ -203,7 +203,7 @@ public func bridgedSignalProducer<First, Second, Third, Fourth>(from signal: RAC
 ///
 /// - returns: Signal producer created from the provided signal.
 public func bridgedSignalProducer<First, Second, Third, Fourth, Fifth>(from signal: RACSignal<RACFiveTuple<First, Second, Third, Fourth, Fifth>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?, Third?, Fourth?, Fifth?)?, AnyError> {
-	return _bridgedSignalProducer(from: signal).map { $0.map(bridgedTuple) }
+	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
 }
 
 extension SignalProducerProtocol where Value: AnyObject {
