@@ -1,0 +1,6 @@
+framework module ReactiveObjCBridge {
+	umbrella header "ReactiveObjCBridge.h"
+	private header "RACScheduler+SwiftSupport.h"
+
+	export *
+}
