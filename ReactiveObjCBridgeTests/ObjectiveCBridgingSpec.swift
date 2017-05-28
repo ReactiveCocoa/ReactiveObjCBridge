@@ -70,7 +70,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					return nil
 				}
 
-				let producer = bridgedSignalProducer(from: racSignal).map { $0 as! Int }
+				let producer = SignalProducer(racSignal).map { $0 as! Int }
 
 				expect((producer.single())?.value) == 0
 				expect((producer.single())?.value) == 1
@@ -81,7 +81,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				let error = TestError.default
 
 				let racSignal = RACSignal<AnyObject>.error(error)
-				let producer = bridgedSignalProducer(from: racSignal)
+				let producer = SignalProducer(racSignal)
 				let result = producer.last()
 
 				expect(result?.error) == AnyError(error)
@@ -95,7 +95,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			describe("on a Signal") {
 				it("should forward events") {
 					let (signal, observer) = Signal<NSNumber, NoError>.pipe()
-					let racSignal = signal.toRACSignal()
+					let racSignal = signal.bridged
 
 					var lastValue: NSNumber?
 					var didComplete = false
@@ -120,7 +120,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should convert errors to NSError") {
 					let (signal, observer) = Signal<AnyObject, TestError>.pipe()
-					let racSignal = signal.toRACSignal()
+					let racSignal = signal.bridged
 
 					let expectedError = TestError.error2
 					var error: TestError?
@@ -136,7 +136,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				
 				it("should maintain userInfo on NSError") {
 					let (signal, observer) = Signal<AnyObject, NSError>.pipe()
-					let racSignal = signal.toRACSignal()
+					let racSignal = signal.bridged
 					
 					var error: String?
 					
@@ -152,7 +152,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				
 				it("should bridge next events with value Optional<Any>.none to nil in Objective-C") {
 					let (signal, observer) = Signal<Optional<AnyObject>, NSError>.pipe()
-					let racSignal = signal.toRACSignal().replay().materialize()
+					let racSignal = signal.bridged.replay().materialize()
 
 					observer.send(value: nil)
 					observer.sendCompleted()
@@ -173,7 +173,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 						return .success(subscriptions as NSNumber)
 					}
-					let racSignal = producer.toRACSignal()
+					let racSignal = producer.bridged
 
 					expect(racSignal.first()) == 0
 					expect(racSignal.first()) == 1
@@ -182,15 +182,15 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should convert errors to NSError") {
 					let producer = SignalProducer<AnyObject, TestError>(error: .error1)
-					let racSignal = producer.toRACSignal().materialize()
+					let racSignal = producer.bridged.materialize()
 
 					let event = racSignal.first()
-					expect(event?.error as? NSError) == TestError.error1 as NSError
+					expect(event?.error as NSError?) == TestError.error1 as NSError
 				}
 				
 				it("should maintain userInfo on NSError") {
 					let producer = SignalProducer<AnyObject, NSError>(error: testNSError)
-					let racSignal = producer.toRACSignal().materialize()
+					let racSignal = producer.bridged.materialize()
 					
 					let event = racSignal.first()
 					let userInfoValue = event?.error?.localizedDescription
@@ -199,7 +199,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				
 				it("should bridge next events with value Optional<AnyObject>.none to nil in Objective-C") {
 					let producer = SignalProducer<Optional<AnyObject>, NSError>(value: nil)
-					let racSignal = producer.toRACSignal().materialize()
+					let racSignal = producer.bridged.materialize()
 					
 					let event = racSignal.first()
 					expect(event?.value).to(beNil())
@@ -234,14 +234,14 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				command.enabled.subscribeNext { enabled = $0 as! Bool }
 				expect(enabled) == true
 
-				let values = bridgedSignalProducer(from: command.executionSignals)
-					.map { bridgedSignalProducer(from: $0!) }
+				let values = SignalProducer(command.executionSignals)
+					.map { SignalProducer($0!) }
 					.flatten(.concat)
 
 				values.startWithResult { results.append($0.value as! Int) }
 				expect(results) == []
 
-				action = bridgedAction(from: command)
+				action = Action(command)
 			}
 
 			it("should reflect the enabledness of the command") {
@@ -287,7 +287,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				enabledProperty = MutableProperty(true)
 
 				action = Action(enabledIf: enabledProperty) { input in
-					let inputNumber = input as Int
+					let inputNumber = input.intValue
 					return SignalProducer(value: "\(inputNumber + 1)" as NSString)
 				}
 
@@ -295,7 +295,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				action.values.observeValues { results.append($0) }
 
-				command = action.toRACCommand()
+				command = action.bridged
 				expect(command).notTo(beNil())
 
 				command.enabled.subscribeNext { enabled = $0 as! Bool }
@@ -335,7 +335,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					return SignalProducer(value: input)
 				}
 
-				command = action.toRACCommand()
+				command = action.bridged
 				expect(command).notTo(beNil())
 
 				let racSignal = command.executionSignals.flatten().materialize().replay()
@@ -354,7 +354,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					return SignalProducer(value: Optional<AnyObject>.none)
 				}
 
-				command = action.toRACCommand()
+				command = action.bridged
 				expect(command).notTo(beNil())
 
 				let racSignal = command.executionSignals.flatten().materialize().replay()
@@ -383,7 +383,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					return SignalProducer(value: "result")
 				}
 
-				command = action.toRACCommand()
+				command = action.bridged
 				expect(command).notTo(beNil())
 
 				command.execute(Optional<AnyObject>.none)
@@ -408,17 +408,17 @@ class ObjectiveCBridgingSpec: QuickSpec {
 		}
 
 		context("re tuples") {
-			describe("bridgedTuple") {
+			describe("repackTuple") {
 				it("should bridge 1-tuples") {
 					let racTuple = RACOneTuple<NSNumber>.pack(0)
-					let tuple = bridgedTuple(from: racTuple)
+					let tuple = repackTuple(from: racTuple)
 
 					expect(tuple) == (0)
 				}
 
 				it("should bridge 2-tuples") {
 					let racTuple = RACTwoTuple<NSNumber, NSNumber>.pack(0, 1)
-					let tuple = bridgedTuple(from: racTuple)
+					let tuple = repackTuple(from: racTuple)
 
 					expect(Mirror(reflecting: tuple).children.count) == 2
 					expect(tuple.0) == 0
@@ -427,7 +427,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge 3-tuples") {
 					let racTuple = RACThreeTuple<NSNumber, NSNumber, NSNumber>.pack(0, 1, 2)
-					let tuple = bridgedTuple(from: racTuple)
+					let tuple = repackTuple(from: racTuple)
 
 					expect(Mirror(reflecting: tuple).children.count) == 3
 					expect(tuple.0) == 0
@@ -437,7 +437,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge 4-tuples") {
 					let racTuple = RACFourTuple<NSNumber, NSNumber, NSNumber, NSNumber>.pack(0, 1, 2, 3)
-					let tuple = bridgedTuple(from: racTuple)
+					let tuple = repackTuple(from: racTuple)
 
 					expect(Mirror(reflecting: tuple).children.count) == 4
 					expect(tuple.0) == 0
@@ -448,7 +448,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge 5-tuples") {
 					let racTuple = RACFiveTuple<NSNumber, NSNumber, NSNumber, NSNumber, NSNumber>.pack(0, 1, 2, 3, 4)
-					let tuple = bridgedTuple(from: racTuple)
+					let tuple = repackTuple(from: racTuple)
 
 					expect(Mirror(reflecting: tuple).children.count) == 5
 					expect(tuple.0) == 0
@@ -460,7 +460,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge tuples containing nils") {
 					let racTuple = RACThreeTuple<NSString, NSString, NSString>.pack(nil, nil, nil)
-					let tuple = bridgedTuple(from: racTuple)
+					let tuple = repackTuple(from: racTuple)
 
 					expect(Mirror(reflecting: tuple).children.count) == 3
 					expect(tuple.0).to(beNil())
@@ -470,7 +470,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge tuples containing both nils and values") {
 					let racTuple = RACThreeTuple<NSString, NSString, NSString>.pack("rose", nil, "petal")
-					let tuple = bridgedTuple(from: racTuple)
+					let tuple = repackTuple(from: racTuple)
 
 					expect(Mirror(reflecting: tuple).children.count) == 3
 					expect(tuple.0) == "rose"
@@ -482,7 +482,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			describe("bridgedSignalProducer") {
 				it("should bridge signals of 1-tuples") {
 					let racSignal = RACSignal<RACOneTuple<NSNumber>>.return(RACOneTuple<NSNumber>.pack(0))
-					let producer = bridgedSignalProducer(from: racSignal)
+					let producer = SignalProducer(racSignal)
 
 					let value = producer.single()?.value as? (Int) ?? nil
 					expect(value) == (0)
@@ -490,7 +490,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge signals of 2-tuples") {
 					let racSignal = RACSignal<RACTwoTuple<NSNumber, NSNumber>>.return(RACTwoTuple<NSNumber, NSNumber>.pack(0, 1))
-					let producer = bridgedSignalProducer(from: racSignal)
+					let producer = SignalProducer(racSignal)
 
 					let value = producer.single()?.value ?? nil
 					let valueMirror = value.map { Mirror(reflecting: $0) }
@@ -501,7 +501,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge signals of 3-tuples") {
 					let racSignal = RACSignal<RACThreeTuple<NSNumber, NSNumber, NSNumber>>.return(RACThreeTuple<NSNumber, NSNumber, NSNumber>.pack(0, 1, 2))
-					let producer = bridgedSignalProducer(from: racSignal).skipNil()
+					let producer = SignalProducer(racSignal).skipNil()
 
 					let value = producer.single()?.value ?? nil
 					let valueMirror = value.map { Mirror(reflecting: $0) }
@@ -513,7 +513,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge signals of 4-tuples") {
 					let racSignal = RACSignal<RACFourTuple<NSNumber, NSNumber, NSNumber, NSNumber>>.return(RACFourTuple<NSNumber, NSNumber, NSNumber, NSNumber>.pack(0, 1, 2, 3))
-					let producer = bridgedSignalProducer(from: racSignal).skipNil()
+					let producer = SignalProducer(racSignal).skipNil()
 
 					let value = producer.single()?.value ?? nil
 					let valueMirror = value.map { Mirror(reflecting: $0) }
@@ -526,7 +526,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge signals of 5-tuples") {
 					let racSignal = RACSignal<RACFiveTuple<NSNumber, NSNumber, NSNumber, NSNumber, NSNumber>>.return(RACFiveTuple<NSNumber, NSNumber, NSNumber, NSNumber, NSNumber>.pack(0, 1, 2, 3, 4))
-					let producer = bridgedSignalProducer(from: racSignal).skipNil()
+					let producer = SignalProducer(racSignal).skipNil()
 
 					let value = producer.single()?.value ?? nil
 					let valueMirror = value.map { Mirror(reflecting: $0) }
@@ -540,7 +540,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge signals of unnumbered tuples") {
 					let racSignal = RACSignal<RACTuple>.return(RACTuple(objectsFrom: [0, 1]))
-					let producer = bridgedSignalProducer(from: racSignal).skipNil()
+					let producer = SignalProducer(racSignal).skipNil()
 
 					let value = producer.single()?.value
 					expect(value?.count) == 2
@@ -548,6 +548,17 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					expect(value?.second as? Int) == 1
 					expect(value?.third).to(beNil())
 				}
+			}
+		}
+
+		describe("RACDisposable") {
+			it("should create a disposable that wraps a Swift disposable") {
+				let swiftDisposable = SimpleDisposable()
+				let objcDisposable = RACDisposable(swiftDisposable)
+				expect(swiftDisposable.isDisposed) == false
+
+				objcDisposable.dispose()
+				expect(swiftDisposable.isDisposed) == true
 			}
 		}
 	}
