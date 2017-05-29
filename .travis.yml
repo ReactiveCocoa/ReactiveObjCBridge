@@ -1,5 +1,5 @@
 language: objective-c
-osx_image: xcode8.2
+osx_image: xcode8.3
 before_install: true
 install: true
 git:
@@ -23,8 +23,7 @@ matrix:
       env:
         - XCODE_SDK=iphonesimulator
         - XCODE_ACTION="build-for-testing test-without-building"
-#        - XCODE_DESTINATION="platform=iOS Simulator,name=iPhone 6s"
-        - XCODE_DESTINATION="platform=iOS Simulator,id=31E6604A-19AA-4B68-B560-C33C584BC80D" # iPhone 6s, iOS 10.2
+        - XCODE_DESTINATION="platform=iOS Simulator,name=iPhone 6s"
     - xcode_scheme: ReactiveObjCBridge-tvOS
       env:
         - XCODE_SDK=appletvsimulator
