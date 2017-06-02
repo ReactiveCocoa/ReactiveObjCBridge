@@ -16,9 +16,9 @@
 		7DFBED201CDB8D7D00EE435B /* Nimble.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D05E662419EDD82000904ACA /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7DFBED211CDB8D8300EE435B /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CDC42E2E1AE7AB8B00965373 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7DFBED271CDB8DE300EE435B /* ObjectiveCBridgingSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A226101A72F30B00D33B74 /* ObjectiveCBridgingSpec.swift */; };
-		9AB5CD651EDAC351004ECB57 /* RACScheduler+SwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 9AB5CD631EDAC351004ECB57 /* RACScheduler+SwiftSupport.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		9AB5CD661EDAC351004ECB57 /* RACScheduler+SwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 9AB5CD631EDAC351004ECB57 /* RACScheduler+SwiftSupport.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		9AB5CD671EDAC351004ECB57 /* RACScheduler+SwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 9AB5CD631EDAC351004ECB57 /* RACScheduler+SwiftSupport.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		9AB5CD651EDAC351004ECB57 /* RACScheduler+SwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 9AB5CD631EDAC351004ECB57 /* RACScheduler+SwiftSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9AB5CD661EDAC351004ECB57 /* RACScheduler+SwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 9AB5CD631EDAC351004ECB57 /* RACScheduler+SwiftSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9AB5CD671EDAC351004ECB57 /* RACScheduler+SwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 9AB5CD631EDAC351004ECB57 /* RACScheduler+SwiftSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9AB5CD681EDAC351004ECB57 /* RACScheduler+SwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 9AB5CD631EDAC351004ECB57 /* RACScheduler+SwiftSupport.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		9AB5CD691EDAC351004ECB57 /* RACScheduler+SwiftSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5CD641EDAC351004ECB57 /* RACScheduler+SwiftSupport.m */; };
 		9AB5CD6A1EDAC351004ECB57 /* RACScheduler+SwiftSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5CD641EDAC351004ECB57 /* RACScheduler+SwiftSupport.m */; };
