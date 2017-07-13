@@ -11,14 +11,14 @@ import ReactiveObjC
 import ReactiveSwift
 import Result
 
-extension SignalProtocol {
+extension Signal {
 	/// Turns each value into an Optional.
 	fileprivate func optionalize() -> Signal<Value?, Error> {
 		return map(Optional.init)
 	}
 }
 
-extension SignalProducerProtocol {
+extension SignalProducer {
 	/// Turns each value into an Optional.
 	fileprivate func optionalize() -> SignalProducer<Value?, Error> {
 		return lift { $0.optionalize() }
@@ -206,7 +206,7 @@ public func bridgedSignalProducer<First, Second, Third, Fourth, Fifth>(from sign
 	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
 }
 
-extension SignalProducerProtocol where Value: AnyObject {
+extension SignalProducer where Value: AnyObject {
 	/// Create a `RACSignal` that will `start()` the producer once for each
 	/// subscription.
 	///
@@ -235,7 +235,7 @@ extension SignalProducerProtocol where Value: AnyObject {
 	}
 }
 
-extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject {
+extension SignalProducer where Value: OptionalProtocol, Value.Wrapped: AnyObject {
 	/// Create a `RACSignal` that will `start()` the producer once for each
 	/// subscription.
 	///
@@ -267,7 +267,7 @@ extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: A
 	}
 }
 
-extension SignalProtocol where Value: AnyObject {
+extension Signal where Value: AnyObject {
 	/// Create a `RACSignal` that will observe the given signal.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
@@ -295,7 +295,7 @@ extension SignalProtocol where Value: AnyObject {
 	}
 }
 
-extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject {
+extension Signal where Value: OptionalProtocol, Value.Wrapped: AnyObject {
 	/// Create a `RACSignal` that will observe the given signal.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
@@ -328,7 +328,7 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 
 // MARK: -
 
-extension ActionProtocol {
+extension Action {
 	fileprivate var isCommandEnabled: RACSignal<NSNumber> {
 		return self.isEnabled.producer
 			.map { $0 as NSNumber }
@@ -363,7 +363,7 @@ public func bridgedAction<Input, Output>(from command: RACCommand<Input, Output>
 	}
 }
 
-extension ActionProtocol where Input: AnyObject, Output: AnyObject {
+extension Action where Input: AnyObject, Output: AnyObject {
 	/// Creates a RACCommand that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
@@ -372,14 +372,14 @@ extension ActionProtocol where Input: AnyObject, Output: AnyObject {
 	///
 	/// - returns: `RACCommand` with bound action.
 	public func toRACCommand() -> RACCommand<Input, Output> {
-		return RACCommand<Input, Output>(enabled: action.isCommandEnabled) { input -> RACSignal<Output> in
+		return RACCommand<Input, Output>(enabled: self.isCommandEnabled) { input -> RACSignal<Output> in
 			return self.apply(input!)
 				.toRACSignal()
 		}
 	}
 }
 
-extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: AnyObject {
+extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: AnyObject {
 	/// Creates a RACCommand that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
@@ -388,7 +388,7 @@ extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject
 	///
 	/// - returns: `RACCommand` with bound action.
 	public func toRACCommand() -> RACCommand<Input.Wrapped, Output> {
-		return RACCommand<Input.Wrapped, Output>(enabled: action.isCommandEnabled) { input -> RACSignal<Output> in
+		return RACCommand<Input.Wrapped, Output>(enabled: self.isCommandEnabled) { input -> RACSignal<Output> in
 			return self
 				.apply(Input(reconstructing: input))
 				.toRACSignal()
@@ -396,7 +396,7 @@ extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject
 	}
 }
 
-extension ActionProtocol where Input: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
+extension Action where Input: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
 	/// Creates a RACCommand that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
@@ -405,7 +405,7 @@ extension ActionProtocol where Input: AnyObject, Output: OptionalProtocol, Outpu
 	///
 	/// - returns: `RACCommand` with bound action.
 	public func toRACCommand() -> RACCommand<Input, Output.Wrapped> {
-		return RACCommand<Input, Output.Wrapped>(enabled: action.isCommandEnabled) { input -> RACSignal<Output.Wrapped> in
+		return RACCommand<Input, Output.Wrapped>(enabled: self.isCommandEnabled) { input -> RACSignal<Output.Wrapped> in
 			return self
 				.apply(input!)
 				.toRACSignal()
@@ -413,7 +413,7 @@ extension ActionProtocol where Input: AnyObject, Output: OptionalProtocol, Outpu
 	}
 }
 
-extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
+extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
 	/// Creates a RACCommand that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
@@ -422,7 +422,7 @@ extension ActionProtocol where Input: OptionalProtocol, Input.Wrapped: AnyObject
 	///
 	/// - returns: `RACCommand` with bound action.
 	public func toRACCommand() -> RACCommand<Input.Wrapped, Output.Wrapped> {
-		return RACCommand<Input.Wrapped, Output.Wrapped>(enabled: action.isCommandEnabled) { input -> RACSignal<Output.Wrapped> in
+		return RACCommand<Input.Wrapped, Output.Wrapped>(enabled: self.isCommandEnabled) { input -> RACSignal<Output.Wrapped> in
 			return self
 				.apply(Input(reconstructing: input))
 				.toRACSignal()
@@ -495,6 +495,8 @@ extension DispatchTimeInterval {
 			return TimeInterval(UInt64(us) * NSEC_PER_USEC) / TimeInterval(NSEC_PER_SEC)
 		case let .nanoseconds(ns):
 			return TimeInterval(ns) / TimeInterval(NSEC_PER_SEC)
+		case let .never:
+			return .infinity
 		}
 	}
 }
