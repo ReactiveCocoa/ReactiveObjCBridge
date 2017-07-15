@@ -36,7 +36,7 @@ extension SignalProducer where Error == AnyError {
 `Signal`, use `RACSignal.toSignalProducer` followed by `SignalProducer.start`,
 which will make those potential side effects explicit.
 
-For the other direction, use the `bridged` instance method.
+For the other direction, use the `bridged` property.
 
 When invoked on a `SignalProducer`, these functions will create a `RACSignal` to
  `start()` the producer once for each subscription:
