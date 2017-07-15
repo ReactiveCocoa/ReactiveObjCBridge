@@ -234,6 +234,73 @@ extension SignalProducer where Error == AnyError {
 	}
 }
 
+extension SignalProducer where Error == AnyError {
+	/// Create a `SignalProducer` of 1-tuples which will subscribe to the provided
+	/// signal once for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal of `RACOneTuple` objects to bridge to a signal producer of 1-tuples.
+	public init<First>(tupleSignal: RACSignal<RACOneTuple<First>>) where Value == First? {
+		self.init(tupleSignal, transform: bridgedTuple(from:))
+	}
+
+	/// Create a `SignalProducer` of 2-tuples which will subscribe to the provided
+	/// signal once for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal of `RACTwoTuple` objects to bridge to a signal producer of 2-tuples.
+	public init<First, Second>(tupleSignal: RACSignal<RACTwoTuple<First, Second>>) where Value == (First?, Second?)? {
+		self.init(tupleSignal, transform: bridgedTuple(from:))
+	}
+
+	/// Create a `SignalProducer` of 3-tuples which will subscribe to the provided
+	/// signal once for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal of `RACThreeTuple` objects to bridge to a signal producer of 3-tuples.
+	public init<First, Second, Third>(tupleSignal: RACSignal<RACThreeTuple<First, Second, Third>>) where Value == (First?, Second?, Third?)? {
+		self.init(tupleSignal, transform: bridgedTuple(from:))
+	}
+
+	/// Create a `SignalProducer` of 4-tuples which will subscribe to the provided
+	/// signal once for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal of `RACFourTuple` objects to bridge to a signal producer of 4-tuples.
+	public init<First, Second, Third, Fourth>(tupleSignal: RACSignal<RACFourTuple<First, Second, Third, Fourth>>) where Value == (First?, Second?, Third?, Fourth?)? {
+		self.init(tupleSignal, transform: bridgedTuple(from:))
+	}
+
+	/// Create a `SignalProducer` of 5-tuples which will subscribe to the provided
+	/// signal once for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal of `RACFiveTuple` objects to bridge to a signal producer of 5-tuples.
+	public init<First, Second, Third, Fourth, Fifth>(tupleSignal: RACSignal<RACFiveTuple<First, Second, Third, Fourth, Fifth>>) where Value == (First?, Second?, Third?, Fourth?, Fifth?)? {
+		self.init(tupleSignal, transform: bridgedTuple(from:))
+	}
+
+	/// Create a `SignalProducer` which will subscribe to the provided signal once
+	/// for each invocation of `start()`, mapping its values with the given
+	/// transform.
+	///
+	/// - parameters:
+	///   - signal: The signal to bridge to a signal producer.
+	///   - transform: The mapping closure to be applied to each of the resulting
+	///				   producer's values.
+	internal init<OriginalValue, NewValue>(_ signal: RACSignal<OriginalValue>, transform: @escaping (OriginalValue) -> NewValue?) where Value == NewValue? {
+		self.init { observer, disposable in
+			let failed: (_ error: Swift.Error?) -> () = { error in
+				observer.send(error: AnyError(error ?? defaultNSError("Nil RACSignal error")))
+			}
+
+			disposable += signal.subscribeNext({ observer.send(value: $0.flatMap(transform)) },
+			                                   error: failed,
+			                                   completed: observer.sendCompleted)
+		}
+	}
+}
+
 extension SignalProducerProtocol where Value: AnyObject {
 	/// A bridged `RACSignal` that will `start()` the producer once for each subscription.
 	///
@@ -452,19 +519,86 @@ extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output
 	public func toRACCommand() -> RACCommand<Input.Wrapped, Output.Wrapped> { return bridged }
 }
 
+// MARK: Tuples
+
+/// Creates a Swift tuple with one element.
+///
+/// - parameters:
+///   - tuple: The `RACOneTuple` to bridge to a Swift tuple.
+///
+/// - returns: Swift tuple created from the provided `RACOneTuple` object.
+public func bridgedTuple<First>(from tuple: RACOneTuple<First>) -> (First?) {
+	return (tuple.first)
+}
+
+/// Creates a Swift tuple with two elements.
+///
+/// - parameters:
+///   - tuple: The `RACTwoTuple` to bridge to a Swift tuple.
+///
+/// - returns: Swift tuple created from the provided `RACTwoTuple` object.
+public func bridgedTuple<First, Second>(from tuple: RACTwoTuple<First, Second>) -> (First?, Second?) {
+	return (tuple.first, tuple.second)
+}
+
+/// Creates a Swift tuple with three elements.
+///
+/// - parameters:
+///   - tuple: The `RACThreeTuple` to bridge to a Swift tuple.
+///
+/// - returns: Swift tuple created from the provided `RACThreeTuple` object.
+public func bridgedTuple<First, Second, Third>(from tuple: RACThreeTuple<First, Second, Third>) -> (First?, Second?, Third?) {
+	return (tuple.first, tuple.second, tuple.third)
+}
+
+/// Creates a Swift tuple with four elements.
+///
+/// - parameters:
+///   - tuple: The `RACFourTuple` to bridge to a Swift tuple.
+///
+/// - returns: Swift tuple created from the provided `RACFourTuple` object.
+public func bridgedTuple<First, Second, Third, Fourth>(from tuple: RACFourTuple<First, Second, Third, Fourth>) -> (First?, Second?, Third?, Fourth?) {
+	return (tuple.first, tuple.second, tuple.third, tuple.fourth)
+}
+
+/// Creates a Swift tuple with five elements.
+///
+/// - parameters:
+///   - tuple: The `RACFiveTuple` to bridge to a Swift tuple.
+///
+/// - returns: Swift tuple created from the provided `RACFiveTuple` object.
+public func bridgedTuple<First, Second, Third, Fourth, Fifth>(from tuple: RACFiveTuple<First, Second, Third, Fourth, Fifth>) -> (First?, Second?, Third?, Fourth?, Fifth?) {
+	return (tuple.first, tuple.second, tuple.third, tuple.fourth, tuple.fifth)
+}
+
 // MARK: - Helpers
 
 extension DispatchTimeInterval {
 	fileprivate var timeInterval: TimeInterval {
-		switch self {
-		case let .seconds(s):
-			return TimeInterval(s)
-		case let .milliseconds(ms):
-			return TimeInterval(TimeInterval(ms) / 1000.0)
-		case let .microseconds(us):
-			return TimeInterval(UInt64(us) * NSEC_PER_USEC) / TimeInterval(NSEC_PER_SEC)
-		case let .nanoseconds(ns):
-			return TimeInterval(ns) / TimeInterval(NSEC_PER_SEC)
-		}
+		#if swift(>=3.2)
+			switch self {
+			case let .seconds(s):
+				return TimeInterval(s)
+			case let .milliseconds(ms):
+				return TimeInterval(TimeInterval(ms) / 1000.0)
+			case let .microseconds(us):
+				return TimeInterval(Int64(us) * Int64(NSEC_PER_USEC)) / TimeInterval(NSEC_PER_SEC)
+			case let .nanoseconds(ns):
+				return TimeInterval(ns) / TimeInterval(NSEC_PER_SEC)
+			case .never:
+				return .infinity
+			}
+		#else
+			switch self {
+			case let .seconds(s):
+				return TimeInterval(s)
+			case let .milliseconds(ms):
+				return TimeInterval(TimeInterval(ms) / 1000.0)
+			case let .microseconds(us):
+				return TimeInterval(Int64(us) * Int64(NSEC_PER_USEC)) / TimeInterval(NSEC_PER_SEC)
+			case let .nanoseconds(ns):
+				return TimeInterval(ns) / TimeInterval(NSEC_PER_SEC)
+			}
+		#endif
 	}
 }
