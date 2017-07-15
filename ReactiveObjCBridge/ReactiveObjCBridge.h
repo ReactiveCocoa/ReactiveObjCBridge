@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RACScheduler+SwiftSupport.h"
-
 //! Project version number for ReactiveObjCBridge.
 FOUNDATION_EXPORT double ReactiveObjCBridgeVersionNumber;
 
