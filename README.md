@@ -52,7 +52,7 @@ extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: A
 
 ```
 
-When inoked on a `Signal`, these methods will create a `RACSignal` that simply
+When invoked on a `Signal`, these methods will create a `RACSignal` that simply
 observes it:
 
 ```swift
