@@ -65,6 +65,19 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 }
 ```
 
+`RACSignal`s of numbered tuples can be bridged to `SignalProducer`s of Swift
+tuples with a special initializer, `init(tupleSignal:)`:
+
+```swift
+extension SignalProducer where Error == AnyError {
+	public init<First>(tupleSignal: RACSignal<RACOneTuple<First>>) where Value == First?
+  public init<First, Second>(tupleSignal: RACSignal<RACTwoTuple<First, Second>>) where Value == (First?, Second?)?
+  public init<First, Second, Third>(tupleSignal: RACSignal<RACThreeTuple<First, Second, Third>>) where Value == (First?, Second?, Third?)?
+  public init<First, Second, Third, Fourth>(tupleSignal: RACSignal<RACFourTuple<First, Second, Third, Fourth>>) where Value == (First?, Second?, Third?, Fourth?)?
+  public init<First, Second, Third, Fourth, Fifth>(tupleSignal: RACSignal<RACFiveTuple<First, Second, Third, Fourth, Fifth>>) where Value == (First?, Second?, Third?, Fourth?, Fifth?)?
+}
+```
+
 ## `RACCommand` and `Action`
 
 To convert `RACCommand`s into the new `Action` type, use the `Action` initializer:
@@ -133,6 +146,19 @@ Use the `RACDisposable` initializer to wrap an instance of `Disposable`:
 extension RACDisposable {
 	public convenience init(_ disposable: Disposable?)
 }
+```
+
+## Numbered `RACTuple`s
+
+Numbered (and typed) `RACTuple` subtypes, such as `RACOneTuple`, `RACTwoTuple`
+etc., can be bridged to native Swift tuples with a series of global functions:
+
+```swift
+public func bridgedTuple<First>(from tuple: RACOneTuple<First>) -> (First?)
+public func bridgedTuple<First, Second>(from tuple: RACTwoTuple<First, Second>) -> (First?, Second?)
+public func bridgedTuple<First, Second, Third>(from tuple: RACThreeTuple<First, Second, Third>) -> (First?, Second?, Third?)
+public func bridgedTuple<First, Second, Third, Fourth>(from tuple: RACFourTuple<First, Second, Third, Fourth>) -> (First?, Second?, Third?, Fourth?)
+public func bridgedTuple<First, Second, Third, Fourth, Fifth>(from tuple: RACFiveTuple<First, Second, Third, Fourth, Fifth>) -> (First?, Second?, Third?, Fourth?, Fifth?)
 ```
 
 [ReactiveSwift]: https://github.com/ReactiveCocoa/ReactiveSwift/
