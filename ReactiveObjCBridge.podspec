@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = "2.0"
 
   s.source       = { :git => "https://github.com/ReactiveCocoa/ReactiveObjCBridge.git", :tag => "#{s.version}" }
-  s.source_files = "ReactiveObjCBridge/*.{swift}"
+  s.source_files = "ReactiveObjCBridge/*.{swift,h,m}"
 
   s.dependency 'ReactiveObjC', '~> 3.0.0'
   s.dependency 'ReactiveSwift', '~> 1.1'
