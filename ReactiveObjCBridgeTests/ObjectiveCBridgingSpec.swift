@@ -77,7 +77,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				expect((producer.single())?.value) == 2
 			}
 
-			it("should forward errors")	{
+			it("should forward errors") {
 				let error = TestError.default
 
 				let racSignal = RACSignal<AnyObject>.error(error)
@@ -133,30 +133,30 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					observer.send(error: expectedError)
 					expect(error) == expectedError
 				}
-				
+
 				it("should maintain userInfo on NSError") {
 					let (signal, observer) = Signal<AnyObject, NSError>.pipe()
 					let racSignal = signal.toRACSignal()
-					
+
 					var error: String?
-					
+
 					racSignal.subscribeError {
 						error = $0?.localizedDescription
 						return
 					}
-					
+
 					observer.send(error: testNSError)
 
 					expect(error) == userInfo[key]
 				}
-				
+
 				it("should bridge next events with value Optional<Any>.none to nil in Objective-C") {
 					let (signal, observer) = Signal<Optional<AnyObject>, NSError>.pipe()
 					let racSignal = signal.toRACSignal().replay().materialize()
 
 					observer.send(value: nil)
 					observer.sendCompleted()
-					
+
 					let event = racSignal.first()
 					expect(event?.value).to(beNil())
 				}
@@ -187,20 +187,20 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					let event = racSignal.first()
 					expect(event?.error as? NSError) == TestError.error1 as NSError
 				}
-				
+
 				it("should maintain userInfo on NSError") {
 					let producer = SignalProducer<AnyObject, NSError>(error: testNSError)
 					let racSignal = producer.toRACSignal().materialize()
-					
+
 					let event = racSignal.first()
 					let userInfoValue = event?.error?.localizedDescription
 					expect(userInfoValue) == userInfo[key]
 				}
-				
+
 				it("should bridge next events with value Optional<AnyObject>.none to nil in Objective-C") {
 					let producer = SignalProducer<Optional<AnyObject>, NSError>(value: nil)
 					let racSignal = producer.toRACSignal().materialize()
-					
+
 					let event = racSignal.first()
 					expect(event?.value).to(beNil())
 				}
@@ -281,7 +281,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 			var command: RACCommand<NSNumber, NSString>!
 			var enabled = false
-			
+
 			beforeEach {
 				results = []
 				enabledProperty = MutableProperty(true)
@@ -331,7 +331,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				var action: Action<Optional<AnyObject>, Optional<AnyObject>, TestError>!
 				var command: RACCommand<AnyObject, AnyObject>!
 
-				action = Action() { input in
+				action = Action { input in
 					return SignalProducer(value: input)
 				}
 
@@ -350,7 +350,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				var action: Action<NSString, Optional<AnyObject>, TestError>!
 				var command: RACCommand<NSString, AnyObject>!
 
-				action = Action() { input in
+				action = Action { _ in
 					return SignalProducer(value: Optional<AnyObject>.none)
 				}
 
@@ -378,7 +378,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					.replay()
 					.materialize()
 
-				action = Action() { input in
+				action = Action { input in
 					inputSubject.sendNext(input)
 					return SignalProducer(value: "result")
 				}
@@ -392,7 +392,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				expect(event.value).to(beNil())
 			}
 		}
-		
+
 		describe("RACSubscriber.sendNext") {
 			it("should have an argument of type Optional.none represented as `nil`") {
 				let racSignal = RACSignal<AnyObject>.createSignal { subscriber in
@@ -400,7 +400,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					subscriber.sendCompleted()
 					return nil
 				}
-				
+
 				let event = try! racSignal.materialize().asynchronousFirstOrDefault(nil, success: nil)
 				let value = event.value
 				expect(value).to(beNil())
