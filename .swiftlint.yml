@@ -1,2 +1,4 @@
+disabled_rules:
+  - large_tuple
 excluded:
   - Carthage
