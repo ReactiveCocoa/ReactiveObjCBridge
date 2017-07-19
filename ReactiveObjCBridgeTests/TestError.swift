@@ -25,7 +25,6 @@ extension AnyError: Equatable {
 	}
 }
 
-
 internal extension SignalProducerProtocol {
 	/// Halts if an error is emitted in the receiver signal.
 	/// This is useful in tests to be able to just use `startWithNext`
@@ -47,4 +46,3 @@ internal extension SignalProtocol {
 		}
 	}
 }
-

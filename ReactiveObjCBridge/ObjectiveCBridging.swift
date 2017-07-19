@@ -129,7 +129,7 @@ private func _bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: 
 			observer.send(value: obj)
 		}
 
-		let failed: (_ error: Swift.Error?) -> () = { error in
+		let failed: (_ error: Swift.Error?) -> Void = { error in
 			observer.send(error: AnyError(error ?? defaultNSError("Nil RACSignal error", file: file, line: line)))
 		}
 
@@ -259,7 +259,7 @@ extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: A
 					break
 				}
 			}
-			
+
 			return RACDisposable {
 				selfDisposable.dispose()
 			}
@@ -318,7 +318,7 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 					break
 				}
 			}
-			
+
 			return RACDisposable {
 				selfDisposable?.dispose()
 			}
