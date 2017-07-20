@@ -223,7 +223,7 @@ extension SignalProducer where Error == AnyError {
 	///   - signal: The signal to bridge to a signal producer.
 	public init<SignalValue>(_ signal: RACSignal<SignalValue>) where Value == SignalValue? {
 		self.init { observer, disposable in
-			let failed: (_ error: Swift.Error?) -> () = { error in
+			let failed: (_ error: Swift.Error?) -> Void = { error in
 				observer.send(error: AnyError(error ?? defaultNSError("Nil RACSignal error")))
 			}
 
@@ -290,7 +290,7 @@ extension SignalProducer where Error == AnyError {
 	///				   producer's values.
 	internal init<OriginalValue, NewValue>(_ signal: RACSignal<OriginalValue>, transform: @escaping (OriginalValue) -> NewValue?) where Value == NewValue? {
 		self.init { observer, disposable in
-			let failed: (_ error: Swift.Error?) -> () = { error in
+			let failed: (_ error: Swift.Error?) -> Void = { error in
 				observer.send(error: AnyError(error ?? defaultNSError("Nil RACSignal error")))
 			}
 
@@ -350,7 +350,7 @@ extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: A
 					break
 				}
 			}
-			
+
 			return RACDisposable(selfDisposable)
 		}
 	}
@@ -391,7 +391,7 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
 	///
-	/// - note: This overload is necessary to prevent `Optional.none` from 
+	/// - note: This overload is necessary to prevent `Optional.none` from
 	///         being bridged to `NSNull` (instead of `nil`).
 	///         See ReactiveObjCBridge#5 for more details.
 	public var bridged: RACSignal<Value.Wrapped> {
@@ -408,7 +408,7 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 					break
 				}
 			}
-			
+
 			return RACDisposable(selfDisposable)
 		}
 	}
