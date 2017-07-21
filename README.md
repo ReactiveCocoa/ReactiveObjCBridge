@@ -1,8 +1,8 @@
 # ReactiveObjCBridge
 
-After announced Swift, ReactiveCocoa was rewritten in Swift. This framework
-creates a bridge between those Swift and Objective-C APIs ([ReactiveSwift][]
-and [ReactiveObjC][]).
+After the announcement of Swift, ReactiveCocoa was rewritten in Swift. This framework
+creates a bridge between those Swift and Objective-C APIs (now known as [ReactiveSwift][]
+and [ReactiveObjC][] respectively).
 
 Because the APIs are based on fundamentally different designs, the conversion is
 not always one-to-one; however, every attempt has been made to faithfully
