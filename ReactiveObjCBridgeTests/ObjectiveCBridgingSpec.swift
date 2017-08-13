@@ -185,7 +185,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					let racSignal = producer.toRACSignal().materialize()
 
 					let event = racSignal.first()
-					expect(event?.error as? NSError) == TestError.error1 as NSError
+					expect(event?.error as NSError?) == TestError.error1 as NSError
 				}
 
 				it("should maintain userInfo on NSError") {
