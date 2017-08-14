@@ -166,7 +166,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				it("should start once per subscription") {
 					var subscriptions = 0
 
-					let producer = SignalProducer<NSNumber, NoError>.attempt {
+					let producer = SignalProducer { () -> Result<NSNumber, NoError> in
 						defer {
 							subscriptions += 1
 						}
