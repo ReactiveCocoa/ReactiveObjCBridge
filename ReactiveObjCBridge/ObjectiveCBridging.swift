@@ -14,14 +14,14 @@ import Result
 extension SignalProtocol {
 	/// Turns each value into an Optional.
 	fileprivate func optionalize() -> Signal<Value?, Error> {
-		return map(Optional.init)
+		return signal.map(Optional.init)
 	}
 }
 
 extension SignalProducerProtocol {
 	/// Turns each value into an Optional.
 	fileprivate func optionalize() -> SignalProducer<Value?, Error> {
-		return lift { $0.optionalize() }
+		return producer.lift { $0.optionalize() }
 	}
 }
 
@@ -307,7 +307,7 @@ extension SignalProducerProtocol where Value: AnyObject {
 	/// - note: Any `interrupted` events will be silently discarded.
 	public var bridged: RACSignal<Value> {
 		return RACSignal<Value>.createSignal { subscriber in
-			let selfDisposable = self.start { event in
+			let selfDisposable = self.producer.start { event in
 				switch event {
 				case let .value(value):
 					subscriber.sendNext(value)
@@ -338,7 +338,7 @@ extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: A
 	///         See ReactiveObjCBridge#5 for more details.
 	public var bridged: RACSignal<Value.Wrapped> {
 		return RACSignal<Value.Wrapped>.createSignal { subscriber in
-			let selfDisposable = self.start { event in
+			let selfDisposable = self.producer.start { event in
 				switch event {
 				case let .value(value):
 					subscriber.sendNext(value.optional)
@@ -365,7 +365,7 @@ extension SignalProtocol where Value: AnyObject {
 	/// - note: Any `interrupted` events will be silently discarded.
 	public var bridged: RACSignal<Value> {
 		return RACSignal<Value>.createSignal { subscriber in
-			let selfDisposable = self.observe { event in
+			let selfDisposable = self.signal.observe { event in
 				switch event {
 				case let .value(value):
 					subscriber.sendNext(value)
@@ -396,7 +396,7 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 	///         See ReactiveObjCBridge#5 for more details.
 	public var bridged: RACSignal<Value.Wrapped> {
 		return RACSignal<Value.Wrapped>.createSignal { subscriber in
-			let selfDisposable = self.observe { event in
+			let selfDisposable = self.signal.observe { event in
 				switch event {
 				case let .value(value):
 					subscriber.sendNext(value.optional)
@@ -418,7 +418,7 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 }
 
 extension Action {
-	fileprivate var isCommandEnabled: RACSignal<NSNumber> {
+	fileprivate var isEnabled: RACSignal<NSNumber> {
 		return self.isEnabled.producer.map { $0 as NSNumber }.bridged
 	}
 }
@@ -462,7 +462,7 @@ extension Action where Input: AnyObject, Output: AnyObject {
 	///         when the action is. However, the reverse is always true: the Action
 	///         will always be marked as executing when the `RACCommand` is.
 	public var bridged: RACCommand<Input, Output> {
-		return RACCommand<Input, Output>(enabled: action.isCommandEnabled) { input -> RACSignal<Output> in
+		return RACCommand<Input, Output>(enabled: isEnabled) { input -> RACSignal<Output> in
 			return self.apply(input!).bridged
 		}
 	}
@@ -478,7 +478,7 @@ extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output
 	///         when the action is. However, the reverse is always true: the Action
 	///         will always be marked as executing when the `RACCommand` is.
 	public var bridged: RACCommand<Input.Wrapped, Output> {
-		return RACCommand<Input.Wrapped, Output>(enabled: action.isCommandEnabled) { input -> RACSignal<Output> in
+		return RACCommand<Input.Wrapped, Output>(enabled: isEnabled) { input -> RACSignal<Output> in
 			return self.apply(Input(reconstructing: input)).bridged
 		}
 	}
@@ -494,7 +494,7 @@ extension Action where Input: AnyObject, Output: OptionalProtocol, Output.Wrappe
 	///         when the action is. However, the reverse is always true: the Action
 	///         will always be marked as executing when the `RACCommand` is.
 	public var bridged: RACCommand<Input, Output.Wrapped> {
-		return RACCommand<Input, Output.Wrapped>(enabled: action.isCommandEnabled) { input -> RACSignal<Output.Wrapped> in
+		return RACCommand<Input, Output.Wrapped>(enabled: isEnabled) { input -> RACSignal<Output.Wrapped> in
 			return self.apply(input!).bridged
 		}
 	}
@@ -510,7 +510,7 @@ extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output
 	///         when the action is. However, the reverse is always true: the Action
 	///         will always be marked as executing when the RACCommand is.
 	public var bridged: RACCommand<Input.Wrapped, Output.Wrapped> {
-		return RACCommand<Input.Wrapped, Output.Wrapped>(enabled: action.isCommandEnabled) { input -> RACSignal<Output.Wrapped> in
+		return RACCommand<Input.Wrapped, Output.Wrapped>(enabled: isEnabled) { input -> RACSignal<Output.Wrapped> in
 			return self.apply(Input(reconstructing: input)).bridged
 		}
 	}

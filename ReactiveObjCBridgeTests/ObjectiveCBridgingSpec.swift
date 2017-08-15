@@ -166,7 +166,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				it("should start once per subscription") {
 					var subscriptions = 0
 
-					let producer = SignalProducer<NSNumber, NoError>.attempt {
+					let producer = SignalProducer { () -> Result<NSNumber, NoError> in
 						defer {
 							subscriptions += 1
 						}
@@ -409,7 +409,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 		describe("RACDisposable") {
 			it("should create a disposable that wraps a Swift disposable") {
-				let swiftDisposable = SimpleDisposable()
+				let swiftDisposable = AnyDisposable()
 				let objcDisposable = RACDisposable(swiftDisposable)
 				expect(swiftDisposable.isDisposed) == false
 
