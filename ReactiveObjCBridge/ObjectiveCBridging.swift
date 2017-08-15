@@ -240,7 +240,7 @@ extension SignalProducer where Error == AnyError {
 	///
 	/// - parameters:
 	///   - signal: The signal of `RACOneTuple` objects to bridge to a signal producer of 1-tuples.
-	public init<First>(tupleSignal: RACSignal<RACOneTuple<First>>) where Value == First? {
+	public init<First>(bridging tupleSignal: RACSignal<RACOneTuple<First>>) where Value == First? {
 		self.init(tupleSignal, transform: bridgedTuple(from:))
 	}
 
@@ -249,7 +249,7 @@ extension SignalProducer where Error == AnyError {
 	///
 	/// - parameters:
 	///   - signal: The signal of `RACTwoTuple` objects to bridge to a signal producer of 2-tuples.
-	public init<First, Second>(tupleSignal: RACSignal<RACTwoTuple<First, Second>>) where Value == (First?, Second?)? {
+	public init<First, Second>(bridging tupleSignal: RACSignal<RACTwoTuple<First, Second>>) where Value == (First?, Second?)? {
 		self.init(tupleSignal, transform: bridgedTuple(from:))
 	}
 
@@ -258,7 +258,7 @@ extension SignalProducer where Error == AnyError {
 	///
 	/// - parameters:
 	///   - signal: The signal of `RACThreeTuple` objects to bridge to a signal producer of 3-tuples.
-	public init<First, Second, Third>(tupleSignal: RACSignal<RACThreeTuple<First, Second, Third>>) where Value == (First?, Second?, Third?)? {
+	public init<First, Second, Third>(bridging tupleSignal: RACSignal<RACThreeTuple<First, Second, Third>>) where Value == (First?, Second?, Third?)? {
 		self.init(tupleSignal, transform: bridgedTuple(from:))
 	}
 
@@ -267,7 +267,7 @@ extension SignalProducer where Error == AnyError {
 	///
 	/// - parameters:
 	///   - signal: The signal of `RACFourTuple` objects to bridge to a signal producer of 4-tuples.
-	public init<First, Second, Third, Fourth>(tupleSignal: RACSignal<RACFourTuple<First, Second, Third, Fourth>>) where Value == (First?, Second?, Third?, Fourth?)? {
+	public init<First, Second, Third, Fourth>(bridging tupleSignal: RACSignal<RACFourTuple<First, Second, Third, Fourth>>) where Value == (First?, Second?, Third?, Fourth?)? {
 		self.init(tupleSignal, transform: bridgedTuple(from:))
 	}
 
@@ -276,7 +276,7 @@ extension SignalProducer where Error == AnyError {
 	///
 	/// - parameters:
 	///   - signal: The signal of `RACFiveTuple` objects to bridge to a signal producer of 5-tuples.
-	public init<First, Second, Third, Fourth, Fifth>(tupleSignal: RACSignal<RACFiveTuple<First, Second, Third, Fourth, Fifth>>) where Value == (First?, Second?, Third?, Fourth?, Fifth?)? {
+	public init<First, Second, Third, Fourth, Fifth>(bridging tupleSignal: RACSignal<RACFiveTuple<First, Second, Third, Fourth, Fifth>>) where Value == (First?, Second?, Third?, Fourth?, Fifth?)? {
 		self.init(tupleSignal, transform: bridgedTuple(from:))
 	}
 

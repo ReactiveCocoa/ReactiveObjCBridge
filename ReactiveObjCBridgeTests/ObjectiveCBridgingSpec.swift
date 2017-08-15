@@ -493,7 +493,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			describe("bridgedSignalProducer") {
 				it("should bridge signals of 1-tuples") {
 					let racSignal = RACSignal<RACOneTuple<NSNumber>>.return(RACOneTuple<NSNumber>.pack(0))
-					let producer = SignalProducer(tupleSignal: racSignal)
+					let producer = SignalProducer(bridging: racSignal)
 
 					let value = producer.single()?.value as? (Int) ?? nil
 					expect(value) == (0)
@@ -501,7 +501,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge signals of 2-tuples") {
 					let racSignal = RACSignal<RACTwoTuple<NSNumber, NSNumber>>.return(RACTwoTuple<NSNumber, NSNumber>.pack(0, 1))
-					let producer = SignalProducer(tupleSignal: racSignal)
+					let producer = SignalProducer(bridging: racSignal)
 
 					let value = producer.single()?.value ?? nil
 					let valueMirror = value.map { Mirror(reflecting: $0) }
@@ -512,7 +512,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge signals of 3-tuples") {
 					let racSignal = RACSignal<RACThreeTuple<NSNumber, NSNumber, NSNumber>>.return(RACThreeTuple<NSNumber, NSNumber, NSNumber>.pack(0, 1, 2))
-					let producer = SignalProducer(tupleSignal: racSignal).skipNil()
+					let producer = SignalProducer(bridging: racSignal).skipNil()
 
 					let value = producer.single()?.value ?? nil
 					let valueMirror = value.map { Mirror(reflecting: $0) }
@@ -524,7 +524,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge signals of 4-tuples") {
 					let racSignal = RACSignal<RACFourTuple<NSNumber, NSNumber, NSNumber, NSNumber>>.return(RACFourTuple<NSNumber, NSNumber, NSNumber, NSNumber>.pack(0, 1, 2, 3))
-					let producer = SignalProducer(tupleSignal: racSignal).skipNil()
+					let producer = SignalProducer(bridging: racSignal).skipNil()
 
 					let value = producer.single()?.value ?? nil
 					let valueMirror = value.map { Mirror(reflecting: $0) }
@@ -537,7 +537,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 
 				it("should bridge signals of 5-tuples") {
 					let racSignal = RACSignal<RACFiveTuple<NSNumber, NSNumber, NSNumber, NSNumber, NSNumber>>.return(RACFiveTuple<NSNumber, NSNumber, NSNumber, NSNumber, NSNumber>.pack(0, 1, 2, 3, 4))
-					let producer = SignalProducer(tupleSignal: racSignal).skipNil()
+					let producer = SignalProducer(bridging: racSignal).skipNil()
 
 					let value = producer.single()?.value ?? nil
 					let valueMirror = value.map { Mirror(reflecting: $0) }
