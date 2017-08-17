@@ -25,7 +25,16 @@ extension SignalProducerProtocol {
 	}
 }
 
-extension RACDisposable: Disposable {}
+extension RACDisposable: Disposable {
+	public convenience init(_ disposable: Disposable?) {
+		if let disposable = disposable {
+			self.init(block: disposable.dispose)
+		} else {
+			self.init()
+		}
+	}
+}
+
 extension RACScheduler: DateScheduler {
 	/// The current date, as determined by this scheduler.
 	public var currentDate: Date {
@@ -82,6 +91,7 @@ extension ImmediateScheduler {
 	/// Create `RACScheduler` that performs actions instantly.
 	///
 	/// - returns: `RACScheduler` that instantly performs actions.
+	@available(*, deprecated, message:"Use `RACScheduler.immediate` directly, or `RACScheduler.init` in a generic context.")
 	public func toRACScheduler() -> RACScheduler {
 		return RACScheduler.immediate()
 	}
@@ -91,8 +101,9 @@ extension UIScheduler {
 	/// Create `RACScheduler` for `UIScheduler`
 	///
 	/// - returns: `RACScheduler` instance that queues events on main thread.
+	@available(*, deprecated, message:"Use `RACScheduler.init` to wrap an `UIScheduler` instead.")
 	public func toRACScheduler() -> RACScheduler {
-		return RACScheduler.mainThread()
+		return RACScheduler(self)
 	}
 }
 
@@ -101,119 +112,200 @@ extension QueueScheduler {
 	///
 	/// - returns: Instance `RACScheduler` that queues events on
 	///            `QueueScheduler`'s queue.
+	@available(*, deprecated, message:"Use `RACScheduler.init` to wrap a `QueueScheduler` instead.")
 	public func toRACScheduler() -> RACScheduler {
-		return RACTargetQueueScheduler(name: "org.reactivecocoa.ReactiveObjCBridge.QueueScheduler.toRACScheduler()", targetQueue: queue)
+		return RACScheduler(self)
 	}
+}
+
+extension RACScheduler {
+	/// Create a `RACScheduler` that wraps the given scheduler.
+	///
+	/// - parameters:
+	///   - scheduler: The `Scheduler` to wrap.
+	///
+	/// - returns: A `RACScheduler` that schedules blocks to `scheduler`.
+	public convenience init(_ scheduler: Scheduler) {
+		self.init(racSwiftScheduler: RACSwiftScheduler(wrapping: scheduler))
+	}
+
+	/// Create a `RACScheduler` that wraps the given scheduler.
+	///
+	/// - parameters:
+	///   - scheduler: The `DateScheduler` to wrap.
+	///
+	/// - returns: A `RACScheduler` that schedules blocks to `scheduler`.
+	public convenience init(_ scheduler: DateScheduler) {
+		self.init(racSwiftScheduler: RACSwiftScheduler(wrapping: scheduler))
+	}
+}
+
+private final class RACSwiftScheduler: RACScheduler {
+	enum Backing {
+		case scheduler(Scheduler)
+		case dateScheduler(DateScheduler)
+	}
+
+	private let base: Backing
+
+	init(wrapping base: Scheduler) {
+		self.base = .scheduler(base)
+	}
+
+	init(wrapping base: DateScheduler) {
+		self.base = .dateScheduler(base)
+	}
+
+	private func wrap(_ block: @escaping () -> Void) -> () -> Void {
+		return {
+			Thread.current.threadDictionary["RACSchedulerCurrentSchedulerKey"] = self
+			block()
+			Thread.current.threadDictionary["RACSchedulerCurrentSchedulerKey"] = nil
+		}
+	}
+
+	open override func schedule(_ block: @escaping () -> Void) -> RACDisposable? {
+		switch base {
+		case let .scheduler(scheduler):
+			return scheduler.schedule(wrap(block)).map(RACDisposable.init)
+
+		case let .dateScheduler(scheduler):
+			return scheduler.schedule(wrap(block)).map(RACDisposable.init)
+		}
+	}
+
+	open override func after(_ date: Date, schedule block: @escaping () -> Swift.Void) -> RACDisposable? {
+		switch base {
+		case let .scheduler(scheduler):
+			Thread.sleep(until: date)
+			return scheduler.schedule(wrap(block)).map(RACDisposable.init)
+
+		case let .dateScheduler(scheduler):
+			return scheduler.schedule(after: date,
+			                          action: wrap(block)).map(RACDisposable.init)
+		}
+	}
+
+	open override func after(_ date: Date, repeatingEvery interval: TimeInterval, withLeeway leeway: TimeInterval, schedule block: @escaping () -> Void) -> RACDisposable? {
+		switch base {
+		case let .scheduler(scheduler):
+			assertionFailure("Undefined behavior.")
+			return scheduler.schedule(wrap(block)).map(RACDisposable.init)
+
+		case let .dateScheduler(scheduler):
+			return scheduler.schedule(after: date,
+			                          interval: .milliseconds(Int(interval * 1000)),
+			                          leeway: .milliseconds(Int(leeway * 1000)),
+			                          action: wrap(block))
+				.map(RACDisposable.init)
+		}
+	}
+}
+
+private func defaultNSError(_ message: String) -> NSError {
+	return Result<(), NSError>.error(message)
 }
 
 private func defaultNSError(_ message: String, file: String, line: Int) -> NSError {
 	return Result<(), NSError>.error(message, file: file, line: line)
 }
 
-/// Create a `SignalProducer` which will subscribe to the provided signal once
-/// for each invocation of `start()`.
-///
-/// - parameters:
-///   - signal: The signal to bridge to a signal producer.
-///   - file: Current file name.
-///   - line: Current line in file.
-///
-/// - returns: Signal producer created from the provided signal.
-public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, AnyError> {
-	return _bridgedSignalProducer(from: signal, file: file, line: line)
+@available(*, unavailable, renamed:"SignalProducer(_:)")
+public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>) -> SignalProducer<Value?, AnyError> {
+	fatalError()
 }
 
-private func _bridgedSignalProducer<Value>(from signal: RACSignal<Value>, file: String = #file, line: Int = #line) -> SignalProducer<Value?, AnyError> {
-	return SignalProducer<Value?, AnyError> { observer, disposable in
-		let next: (_ value: Value?) -> Void = { obj in
-			observer.send(value: obj)
-		}
+extension SignalProducer where Error == AnyError {
+	/// Create a `SignalProducer` which will subscribe to the provided signal once
+	/// for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal to bridge to a signal producer.
+	public init<SignalValue>(_ signal: RACSignal<SignalValue>) where Value == SignalValue? {
+		self.init { observer, disposable in
+			let failed: (_ error: Swift.Error?) -> Void = { error in
+				observer.send(error: AnyError(error ?? defaultNSError("Nil RACSignal error")))
+			}
 
-		let failed: (_ error: Swift.Error?) -> Void = { error in
-			observer.send(error: AnyError(error ?? defaultNSError("Nil RACSignal error", file: file, line: line)))
+			disposable += signal.subscribeNext(observer.send(value:),
+			                                   error: failed,
+			                                   completed: observer.sendCompleted)
 		}
-
-		let completed = {
-			observer.sendCompleted()
-		}
-
-		disposable += signal.subscribeNext(next, error: failed, completed: completed)
 	}
 }
 
-/// Create a `SignalProducer` of 1-tuples which will subscribe to the provided
-/// signal once for each invocation of `start()`.
-///
-/// - parameters:
-///   - signal: The signal of `RACOneTuple` objects to bridge to a signal producer of 1-tuples.
-///   - file: Current file name.
-///   - line: Current line in file.
-///
-/// - returns: Signal producer created from the provided signal.
-public func bridgedSignalProducer<First>(from signal: RACSignal<RACOneTuple<First>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?)?, AnyError> {
-	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
-}
+extension SignalProducer where Error == AnyError {
+	/// Create a `SignalProducer` of 1-tuples which will subscribe to the provided
+	/// signal once for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal of `RACOneTuple` objects to bridge to a signal producer of 1-tuples.
+	public init<First>(bridging tupleSignal: RACSignal<RACOneTuple<First>>) where Value == First? {
+		self.init(tupleSignal, transform: bridgedTuple(from:))
+	}
 
-/// Create a `SignalProducer` of 2-tuples which will subscribe to the provided
-/// signal once for each invocation of `start()`.
-///
-/// - parameters:
-///   - signal: The signal of `RACTwoTuple` objects to bridge to a signal producer of 2-tuples.
-///   - file: Current file name.
-///   - line: Current line in file.
-///
-/// - returns: Signal producer created from the provided signal.
-public func bridgedSignalProducer<First, Second>(from signal: RACSignal<RACTwoTuple<First, Second>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?)?, AnyError> {
-	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
-}
+	/// Create a `SignalProducer` of 2-tuples which will subscribe to the provided
+	/// signal once for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal of `RACTwoTuple` objects to bridge to a signal producer of 2-tuples.
+	public init<First, Second>(bridging tupleSignal: RACSignal<RACTwoTuple<First, Second>>) where Value == (First?, Second?)? {
+		self.init(tupleSignal, transform: bridgedTuple(from:))
+	}
 
-/// Create a `SignalProducer` of 3-tuples which will subscribe to the provided
-/// signal once for each invocation of `start()`.
-///
-/// - parameters:
-///   - signal: The signal of `RACThreeTuple` objects to bridge to a signal producer of 3-tuples.
-///   - file: Current file name.
-///   - line: Current line in file.
-///
-/// - returns: Signal producer created from the provided signal.
-public func bridgedSignalProducer<First, Second, Third>(from signal: RACSignal<RACThreeTuple<First, Second, Third>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?, Third?)?, AnyError> {
-	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
-}
+	/// Create a `SignalProducer` of 3-tuples which will subscribe to the provided
+	/// signal once for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal of `RACThreeTuple` objects to bridge to a signal producer of 3-tuples.
+	public init<First, Second, Third>(bridging tupleSignal: RACSignal<RACThreeTuple<First, Second, Third>>) where Value == (First?, Second?, Third?)? {
+		self.init(tupleSignal, transform: bridgedTuple(from:))
+	}
 
-/// Create a `SignalProducer` of 4-tuples which will subscribe to the provided
-/// signal once for each invocation of `start()`.
-///
-/// - parameters:
-///   - signal: The signal of `RACFourTuple` objects to bridge to a signal producer of 4-tuples.
-///   - file: Current file name.
-///   - line: Current line in file.
-///
-/// - returns: Signal producer created from the provided signal.
-public func bridgedSignalProducer<First, Second, Third, Fourth>(from signal: RACSignal<RACFourTuple<First, Second, Third, Fourth>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?, Third?, Fourth?)?, AnyError> {
-	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
-}
+	/// Create a `SignalProducer` of 4-tuples which will subscribe to the provided
+	/// signal once for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal of `RACFourTuple` objects to bridge to a signal producer of 4-tuples.
+	public init<First, Second, Third, Fourth>(bridging tupleSignal: RACSignal<RACFourTuple<First, Second, Third, Fourth>>) where Value == (First?, Second?, Third?, Fourth?)? {
+		self.init(tupleSignal, transform: bridgedTuple(from:))
+	}
 
-/// Create a `SignalProducer` of 5-tuples which will subscribe to the provided
-/// signal once for each invocation of `start()`.
-///
-/// - parameters:
-///   - signal: The signal of `RACFiveTuple` objects to bridge to a signal producer of 5-tuples.
-///   - file: Current file name.
-///   - line: Current line in file.
-///
-/// - returns: Signal producer created from the provided signal.
-public func bridgedSignalProducer<First, Second, Third, Fourth, Fifth>(from signal: RACSignal<RACFiveTuple<First, Second, Third, Fourth, Fifth>>, file: String = #file, line: Int = #line) -> SignalProducer<(First?, Second?, Third?, Fourth?, Fifth?)?, AnyError> {
-	return _bridgedSignalProducer(from: signal, file: file, line: line).map { $0.map(bridgedTuple) }
+	/// Create a `SignalProducer` of 5-tuples which will subscribe to the provided
+	/// signal once for each invocation of `start()`.
+	///
+	/// - parameters:
+	///   - signal: The signal of `RACFiveTuple` objects to bridge to a signal producer of 5-tuples.
+	public init<First, Second, Third, Fourth, Fifth>(bridging tupleSignal: RACSignal<RACFiveTuple<First, Second, Third, Fourth, Fifth>>) where Value == (First?, Second?, Third?, Fourth?, Fifth?)? {
+		self.init(tupleSignal, transform: bridgedTuple(from:))
+	}
+
+	/// Create a `SignalProducer` which will subscribe to the provided signal once
+	/// for each invocation of `start()`, mapping its values with the given
+	/// transform.
+	///
+	/// - parameters:
+	///   - signal: The signal to bridge to a signal producer.
+	///   - transform: The mapping closure to be applied to each of the resulting
+	///				   producer's values.
+	internal init<OriginalValue, NewValue>(_ signal: RACSignal<OriginalValue>, transform: @escaping (OriginalValue) -> NewValue?) where Value == NewValue? {
+		self.init { observer, disposable in
+			let failed: (_ error: Swift.Error?) -> Void = { error in
+				observer.send(error: AnyError(error ?? defaultNSError("Nil RACSignal error")))
+			}
+
+			disposable += signal.subscribeNext({ observer.send(value: $0.flatMap(transform)) },
+			                                   error: failed,
+			                                   completed: observer.sendCompleted)
+		}
+	}
 }
 
 extension SignalProducerProtocol where Value: AnyObject {
-	/// Create a `RACSignal` that will `start()` the producer once for each
-	/// subscription.
+	/// A bridged `RACSignal` that will `start()` the producer once for each subscription.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
-	///
-	/// - returns: `RACSignal` instantiated from `self`.
-	public func toRACSignal() -> RACSignal<Value> {
+	public var bridged: RACSignal<Value> {
 		return RACSignal<Value>.createSignal { subscriber in
 			let selfDisposable = self.producer.start { event in
 				switch event {
@@ -228,24 +320,23 @@ extension SignalProducerProtocol where Value: AnyObject {
 				}
 			}
 
-			return RACDisposable {
-				selfDisposable.dispose()
-			}
+			return RACDisposable(selfDisposable)
 		}
 	}
+
+	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	public func toRACSignal() -> RACSignal<Value> { return bridged }
 }
 
 extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject {
-	/// Create a `RACSignal` that will `start()` the producer once for each
-	/// subscription.
+	/// A bridged `RACSignal` that will `start()` the producer once for each subscription.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
+	///
 	/// - note: This overload is necessary to prevent `Optional.none` from
 	///         being bridged to `NSNull` (instead of `nil`).
 	///         See ReactiveObjCBridge#5 for more details.
-	///
-	/// - returns: `RACSignal` instantiated from `self`.
-	public func toRACSignal() -> RACSignal<Value.Wrapped> {
+	public var bridged: RACSignal<Value.Wrapped> {
 		return RACSignal<Value.Wrapped>.createSignal { subscriber in
 			let selfDisposable = self.producer.start { event in
 				switch event {
@@ -260,20 +351,19 @@ extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: A
 				}
 			}
 
-			return RACDisposable {
-				selfDisposable.dispose()
-			}
+			return RACDisposable(selfDisposable)
 		}
 	}
+
+	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	public func toRACSignal() -> RACSignal<Value.Wrapped> { return bridged }
 }
 
 extension SignalProtocol where Value: AnyObject {
-	/// Create a `RACSignal` that will observe the given signal.
+	/// A bridged `RACSignal` that will observe the given signal.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
-	///
-	/// - returns: `RACSignal` instantiated from `self`.
-	public func toRACSignal() -> RACSignal<Value> {
+	public var bridged: RACSignal<Value> {
 		return RACSignal<Value>.createSignal { subscriber in
 			let selfDisposable = self.signal.observe { event in
 				switch event {
@@ -288,23 +378,23 @@ extension SignalProtocol where Value: AnyObject {
 				}
 			}
 
-			return RACDisposable {
-				selfDisposable?.dispose()
-			}
+			return RACDisposable(selfDisposable)
 		}
 	}
+
+	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	public func toRACSignal() -> RACSignal<Value> { return bridged }
 }
 
 extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject {
-	/// Create a `RACSignal` that will observe the given signal.
+	/// A bridged `RACSignal` that will observe the given signal.
 	///
 	/// - note: Any `interrupted` events will be silently discarded.
-	/// - note: This overload is necessary to prevent `Optional.none` from 
+	///
+	/// - note: This overload is necessary to prevent `Optional.none` from
 	///         being bridged to `NSNull` (instead of `nil`).
 	///         See ReactiveObjCBridge#5 for more details.
-	///
-	/// - returns: `RACSignal` instantiated from `self`.
-	public func toRACSignal() -> RACSignal<Value.Wrapped> {
+	public var bridged: RACSignal<Value.Wrapped> {
 		return RACSignal<Value.Wrapped>.createSignal { subscriber in
 			let selfDisposable = self.signal.observe { event in
 				switch event {
@@ -319,115 +409,114 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 				}
 			}
 
-			return RACDisposable {
-				selfDisposable?.dispose()
-			}
+			return RACDisposable(selfDisposable)
 		}
 	}
-}
 
-// MARK: -
+	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	public func toRACSignal() -> RACSignal<Value.Wrapped> { return bridged }
+}
 
 extension Action {
 	fileprivate var isEnabled: RACSignal<NSNumber> {
-		return self.isEnabled.producer
-			.map { $0 as NSNumber }
-			.toRACSignal()
+		return self.isEnabled.producer.map { $0 as NSNumber }.bridged
 	}
 }
 
-/// Creates an Action that will execute the receiver.
-///
-/// - note: The returned Action will not necessarily be marked as executing
-///         when the command is. However, the reverse is always true: the
-///         RACCommand will always be marked as executing when the action
-///         is.
-///
-/// - parameters:
-///   - command: The command to bridge to an action.
-///   - file: Current file name.
-///   - line: Current line in file.
-///
-/// - returns: Action created from `self`.
-public func bridgedAction<Input, Output>(from command: RACCommand<Input, Output>, file: String = #file, line: Int = #line) -> Action<Input?, Output?, AnyError> {
-	let enabledProperty = MutableProperty(true)
+@available(*, unavailable, renamed:"Action(_:)")
+public func bridgedAction<Input, Output>(from command: RACCommand<Input, Output>) -> Action<Input?, Output?, AnyError> {
+	fatalError()
+}
 
-	enabledProperty <~ bridgedSignalProducer(from: command.enabled)
-		.map { $0 as! Bool }
-		.flatMapError { _ in SignalProducer<Bool, NoError>(value: false) }
+extension Action where Error == AnyError {
+	/// Create an Action that wraps the given command.
+	///
+	/// - note: The created `Action` will not necessarily be marked as executing
+	///         when the command is. However, the reverse is always true: the
+	///         `RACCommand` will always be marked as executing when the action
+	///         is.
+	///
+	/// - parameters:
+	///   - command: The command to wrap.
+	public convenience init<CommandInput, CommandOutput>(
+		_ command: RACCommand<CommandInput, CommandOutput>
+	) where Input == CommandInput?, Output == CommandOutput? {
+		let enabledProperty = MutableProperty(true)
 
-	return Action<Input?, Output?, AnyError>(enabledIf: enabledProperty) { input -> SignalProducer<Output?, AnyError> in
-		let signal: RACSignal<Output> = command.execute(input)
+		enabledProperty <~ SignalProducer(command.enabled)
+			.map { $0 as! Bool }
+			.flatMapError { _ in SignalProducer<Bool, NoError>(value: false) }
 
-		return bridgedSignalProducer(from: signal)
+		self.init(enabledIf: enabledProperty) { input -> SignalProducer<Output, AnyError> in
+			let signal: RACSignal<CommandOutput> = command.execute(input)
+
+			return SignalProducer(signal)
+		}
 	}
 }
 
 extension Action where Input: AnyObject, Output: AnyObject {
-	/// Creates a RACCommand that will execute the action.
+	/// A bridged `RACCommand` that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
 	///         when the action is. However, the reverse is always true: the Action
-	///         will always be marked as executing when the RACCommand is.
-	///
-	/// - returns: `RACCommand` with bound action.
-	public func toRACCommand() -> RACCommand<Input, Output> {
+	///         will always be marked as executing when the `RACCommand` is.
+	public var bridged: RACCommand<Input, Output> {
 		return RACCommand<Input, Output>(enabled: isEnabled) { input -> RACSignal<Output> in
-			return self.apply(input!)
-				.toRACSignal()
+			return self.apply(input!).bridged
 		}
 	}
+
+	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	public func toRACCommand() -> RACCommand<Input, Output> { return bridged }
 }
 
 extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: AnyObject {
-	/// Creates a RACCommand that will execute the action.
+	/// A bridged `RACCommand` that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
 	///         when the action is. However, the reverse is always true: the Action
-	///         will always be marked as executing when the RACCommand is.
-	///
-	/// - returns: `RACCommand` with bound action.
-	public func toRACCommand() -> RACCommand<Input.Wrapped, Output> {
+	///         will always be marked as executing when the `RACCommand` is.
+	public var bridged: RACCommand<Input.Wrapped, Output> {
 		return RACCommand<Input.Wrapped, Output>(enabled: isEnabled) { input -> RACSignal<Output> in
-			return self
-				.apply(Input(reconstructing: input))
-				.toRACSignal()
+			return self.apply(Input(reconstructing: input)).bridged
 		}
 	}
+
+	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	public func toRACCommand() -> RACCommand<Input.Wrapped, Output> { return bridged }
 }
 
 extension Action where Input: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
-	/// Creates a RACCommand that will execute the action.
+	/// A bridged `RACCommand` that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
 	///         when the action is. However, the reverse is always true: the Action
-	///         will always be marked as executing when the RACCommand is.
-	///
-	/// - returns: `RACCommand` with bound action.
-	public func toRACCommand() -> RACCommand<Input, Output.Wrapped> {
+	///         will always be marked as executing when the `RACCommand` is.
+	public var bridged: RACCommand<Input, Output.Wrapped> {
 		return RACCommand<Input, Output.Wrapped>(enabled: isEnabled) { input -> RACSignal<Output.Wrapped> in
-			return self
-				.apply(input!)
-				.toRACSignal()
+			return self.apply(input!).bridged
 		}
 	}
+
+	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	public func toRACCommand() -> RACCommand<Input, Output.Wrapped> { return bridged }
 }
 
 extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output: OptionalProtocol, Output.Wrapped: AnyObject {
-	/// Creates a RACCommand that will execute the action.
+	/// A bridged `RACCommand` that will execute the action.
 	///
 	/// - note: The returned command will not necessarily be marked as executing
 	///         when the action is. However, the reverse is always true: the Action
 	///         will always be marked as executing when the RACCommand is.
-	///
-	/// - returns: `RACCommand` with bound action.
-	public func toRACCommand() -> RACCommand<Input.Wrapped, Output.Wrapped> {
+	public var bridged: RACCommand<Input.Wrapped, Output.Wrapped> {
 		return RACCommand<Input.Wrapped, Output.Wrapped>(enabled: isEnabled) { input -> RACSignal<Output.Wrapped> in
-			return self
-				.apply(Input(reconstructing: input))
-				.toRACSignal()
+			return self.apply(Input(reconstructing: input)).bridged
 		}
 	}
+
+	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	public func toRACCommand() -> RACCommand<Input.Wrapped, Output.Wrapped> { return bridged }
 }
 
 // MARK: Tuples
