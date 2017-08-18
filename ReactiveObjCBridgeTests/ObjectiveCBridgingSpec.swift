@@ -166,13 +166,14 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				it("should start once per subscription") {
 					var subscriptions = 0
 
-					let producer = SignalProducer { () -> Result<NSNumber, NoError> in
+					let producer = SignalProducer<NSNumber, NoError> { () -> Result<NSNumber, NoError> in
 						defer {
 							subscriptions += 1
 						}
 
 						return .success(subscriptions as NSNumber)
 					}
+
 					let racSignal = producer.bridged
 
 					expect(racSignal.first()) == 0
@@ -560,6 +561,28 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					expect(value?.third).to(beNil())
 				}
 			}
+		}
+	}
+}
+
+extension SignalProducer where Error == NoError {
+	/// Create a `SignalProducer` that will attempt the given operation once for
+	/// each invocation of `start()`.
+	///
+	/// Upon success, the started signal will send the resulting value then
+	/// complete. Upon failure, the started signal will fail with the error that
+	/// occurred.
+	///
+	/// - parameters:
+	///   - action: A closure that returns instance of `Result`.
+	public init(_ action: @escaping () -> Result<Value, NoError>) {
+		self.init { observer, _ in
+			action().analysis(ifSuccess: { value in
+				observer.send(value: value)
+				observer.sendCompleted()
+			}, ifFailure: { error in
+				observer.send(error: error)
+			})
 		}
 	}
 }
