@@ -1,2 +1,2 @@
 github "ReactiveCocoa/ReactiveObjC" ~> 3.0.0
-github "ReactiveCocoa/ReactiveSwift" ~> 2.0.0
+github "ReactiveCocoa/ReactiveSwift" "2.1.0-alpha.2"
