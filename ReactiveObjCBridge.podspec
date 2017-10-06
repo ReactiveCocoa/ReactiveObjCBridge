@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.module_map = 'ReactiveObjCBridge/module.modulemap'
 
   s.dependency 'ReactiveObjC', '~> 3.0.0'
-  s.dependency 'ReactiveSwift', '~> 2.0'
+  s.dependency 'ReactiveSwift', '2.1.0-alpha.2'
 
   s.pod_target_xcconfig = { "OTHER_SWIFT_FLAGS[config=Release]" => "-suppress-warnings" }
 end
