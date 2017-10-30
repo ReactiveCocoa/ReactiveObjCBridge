@@ -426,32 +426,32 @@ extension Property where Value: AnyObject {
 }
 
 extension Property where Value: AnyObject {
-	/// A bridged `RACSignal` that will `start()` with the property's current
-	/// value (followed by all changes over time) for each subscription.
+	/// A bridged `RACSignal` that will send the property's current value
+	/// (followed by all changes over time) for each subscription.
 	public var bridged: RACSignal<Value> {
 		return self.producer.bridged
 	}
 }
 
 extension Property where Value: OptionalProtocol, Value.Wrapped: AnyObject {
-	/// A bridged `RACSignal` that will `start()` with the property's current
-	/// value (followed by all changes over time) for each subscription.
+	/// A bridged `RACSignal` that will send the property's current value
+	/// (followed by all changes over time) for each subscription.
 	public var bridged: RACSignal<Value.Wrapped> {
 		return self.producer.map { $0.optional }.bridged
 	}
 }
 
 extension PropertyProtocol where Self.Value: AnyObject {
-	/// A bridged `RACSignal` that will `start()` with the property's current
-	/// value (followed by all changes over time) for each subscription.
+	/// A bridged `RACSignal` that will send the property's current value
+	/// (followed by all changes over time) for each subscription.
 	public var bridged: RACSignal<Value> {
 		return self.producer.bridged
 	}
 }
 
 extension PropertyProtocol where Self.Value: OptionalProtocol, Self.Value.Wrapped: AnyObject {
-	/// A bridged `RACSignal` that will `start()` with the property's current
-	/// value (followed by all changes over time) for each subscription.
+	/// A bridged `RACSignal` that will send the property's current value
+	/// (followed by all changes over time) for each subscription.
 	public var bridged: RACSignal<Value.Wrapped> {
 		return self.producer.map { $0.optional }.bridged
 	}
