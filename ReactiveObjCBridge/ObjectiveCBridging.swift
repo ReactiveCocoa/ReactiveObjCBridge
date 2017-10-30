@@ -11,19 +11,7 @@ import ReactiveObjC
 import ReactiveSwift
 import Result
 
-extension SignalProtocol {
-	/// Turns each value into an Optional.
-	fileprivate func optionalize() -> Signal<Value?, Error> {
-		return signal.map(Optional.init)
-	}
-}
-
-extension SignalProducerProtocol {
-	/// Turns each value into an Optional.
-	fileprivate func optionalize() -> SignalProducer<Value?, Error> {
-		return producer.lift { $0.optionalize() }
-	}
-}
+// MARK: - Disposables
 
 extension RACDisposable: Disposable {
 	public convenience init(_ disposable: Disposable?) {
@@ -34,6 +22,8 @@ extension RACDisposable: Disposable {
 		}
 	}
 }
+
+// MARK: - Schedulers
 
 extension RACScheduler: DateScheduler {
 	/// The current date, as determined by this scheduler.
@@ -202,13 +192,7 @@ private final class RACSwiftScheduler: RACScheduler {
 	}
 }
 
-private func defaultNSError(_ message: String) -> NSError {
-	return Result<(), NSError>.error(message)
-}
-
-private func defaultNSError(_ message: String, file: String, line: Int) -> NSError {
-	return Result<(), NSError>.error(message, file: file, line: line)
-}
+// MARK: - Signals
 
 @available(*, unavailable, renamed:"SignalProducer(_:)")
 public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>) -> SignalProducer<Value?, AnyError> {
@@ -299,6 +283,14 @@ extension SignalProducer where Error == AnyError {
 			                                   completed: observer.sendCompleted)
 		}
 	}
+}
+
+private func defaultNSError(_ message: String) -> NSError {
+	return Result<(), NSError>.error(message)
+}
+
+private func defaultNSError(_ message: String, file: String, line: Int) -> NSError {
+	return Result<(), NSError>.error(message, file: file, line: line)
 }
 
 extension SignalProducerProtocol where Value: AnyObject {
@@ -417,6 +409,22 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 	public func toRACSignal() -> RACSignal<Value.Wrapped> { return bridged }
 }
 
+extension SignalProtocol {
+	/// Turns each value into an Optional.
+	fileprivate func optionalize() -> Signal<Value?, Error> {
+		return signal.map(Optional.init)
+	}
+}
+
+extension SignalProducerProtocol {
+	/// Turns each value into an Optional.
+	fileprivate func optionalize() -> SignalProducer<Value?, Error> {
+		return producer.lift { $0.optionalize() }
+	}
+}
+
+// MARK: - Actions
+
 extension Action {
 	fileprivate var isEnabled: RACSignal<NSNumber> {
 		return self.isEnabled.producer.map { $0 as NSNumber }.bridged
@@ -519,7 +527,7 @@ extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output
 	public func toRACCommand() -> RACCommand<Input.Wrapped, Output.Wrapped> { return bridged }
 }
 
-// MARK: Tuples
+// MARK: - Tuples
 
 /// Creates a Swift tuple with one element.
 ///
