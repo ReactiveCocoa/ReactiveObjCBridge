@@ -47,7 +47,7 @@ matrix:
       env:
         - JOB=CARTHAGE-watchOS
     - script:
-      - pod repo update --verbose
+      - pod repo update --silent
       - pod lib lint --allow-warnings
       env:
         - JOB=PODSPEC
