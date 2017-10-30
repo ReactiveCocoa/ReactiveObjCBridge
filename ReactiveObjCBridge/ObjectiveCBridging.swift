@@ -409,20 +409,6 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 	public func toRACSignal() -> RACSignal<Value.Wrapped> { return bridged }
 }
 
-extension SignalProtocol {
-	/// Turns each value into an Optional.
-	fileprivate func optionalize() -> Signal<Value?, Error> {
-		return signal.map(Optional.init)
-	}
-}
-
-extension SignalProducerProtocol {
-	/// Turns each value into an Optional.
-	fileprivate func optionalize() -> SignalProducer<Value?, Error> {
-		return producer.lift { $0.optionalize() }
-	}
-}
-
 // MARK: - Property
 
 extension Property where Value: AnyObject {
