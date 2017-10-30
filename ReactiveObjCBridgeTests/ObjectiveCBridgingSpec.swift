@@ -57,7 +57,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			}
 		}
 
-		describe("signalProducer") {
+		describe("SignalProducer") {
 			it("should subscribe once per start()") {
 				var subscriptions = 0
 
@@ -88,7 +88,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			}
 		}
 
-		describe("toRACSignal") {
+		describe("a bridged RACSignal") {
 			let key = NSLocalizedDescriptionKey
 			let userInfo: [String: String] = [key: "TestValue"]
 			let testNSError = NSError(domain: "TestDomain", code: 1, userInfo: userInfo)
@@ -206,9 +206,68 @@ class ObjectiveCBridgingSpec: QuickSpec {
 					expect(event?.value).to(beNil())
 				}
 			}
+
+			describe("on a Property") {
+				it("should bridge values") {
+					let property = MutableProperty<Int>(1)
+					let racSignal = property.map { $0 as NSNumber }.bridged.materialize()
+
+					let event = racSignal.first()
+					expect(event?.value) == NSNumber(value: 1)
+				}
+
+				it("should bridge values with value Optional<AnyObject>.none to nil in Objective-C") {
+					let property = MutableProperty<AnyObject?>(nil)
+					let racSignal = property.bridged.materialize()
+
+					let event = racSignal.first()
+					expect(event?.value).to(beNil())
+				}
+			}
 		}
 
-		describe("toAction") {
+		describe("Property") {
+			it("should subscribe only once") {
+				var subscriptions = 0
+
+				let racSignal = RACSignal<NSNumber>.createSignal { subscriber in
+					subscriber.sendNext(subscriptions)
+					subscriber.sendCompleted()
+
+					subscriptions += 1
+
+					return nil
+				}
+
+				let property = Property(initial: -1, then: racSignal)
+
+				expect(property.value) == 0
+				expect(property.value) == 0
+				expect(property.value) == 0
+			}
+
+			it("should forward values") {
+				let racSubject = RACSubject<NSNumber>()
+				let property = Property(initial: 0, then: racSubject)
+
+				expect(property.value) == 0
+
+				racSubject.sendNext(1)
+				expect(property.value) == 1
+			}
+
+			it("should ignore nil values") {
+				let racSubject = RACSubject<NSNumber>()
+				let property = Property(initial: 0, then: racSubject)
+
+				expect(property.value) == 0
+
+				racSubject.sendNext(nil)
+				expect(property.value) == 0
+			}
+		}
+
+		describe("Action") {
 			var command: RACCommand<NSNumber, NSNumber>!
 			var results: [Int] = []
 
@@ -274,7 +333,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			}
 		}
 
-		describe("toRACCommand") {
+		describe("a bridged RACCommand") {
 			var action: Action<NSNumber, NSString, TestError>!
 			var results: [NSString] = []
 

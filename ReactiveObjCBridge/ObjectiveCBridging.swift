@@ -423,6 +423,54 @@ extension SignalProducerProtocol {
 	}
 }
 
+// MARK: - Property
+
+extension Property where Value: AnyObject {
+	/// Initializes a composed property that first takes on `initial`, then each
+	/// value sent on the given `signal`.
+	///
+	/// - parameters:
+	///   - initial: Starting value for the property.
+	///   - values: The signal to bridge to a signal producer which will start
+	///             immediately and send values to the property.
+	public convenience init(initial value: Value, then signal: RACSignal<Value>) {
+		let producer = SignalProducer(signal).skipNil().flatMapError { _ in SignalProducer<Value, NoError>.empty }
+		self.init(initial: value, then: producer)
+	}
+}
+
+extension Property where Value: AnyObject {
+	/// A bridged `RACSignal` that will `start()` with the property's current
+	/// value (followed by all changes over time) for each subscription.
+	public var bridged: RACSignal<Value> {
+		return self.producer.bridged
+	}
+}
+
+extension Property where Value: OptionalProtocol, Value.Wrapped: AnyObject {
+	/// A bridged `RACSignal` that will `start()` with the property's current
+	/// value (followed by all changes over time) for each subscription.
+	public var bridged: RACSignal<Value.Wrapped> {
+		return self.producer.map { $0.optional }.bridged
+	}
+}
+
+extension PropertyProtocol where Self.Value: AnyObject {
+	/// A bridged `RACSignal` that will `start()` with the property's current
+	/// value (followed by all changes over time) for each subscription.
+	public var bridged: RACSignal<Value> {
+		return self.producer.bridged
+	}
+}
+
+extension PropertyProtocol where Self.Value: OptionalProtocol, Self.Value.Wrapped: AnyObject {
+	/// A bridged `RACSignal` that will `start()` with the property's current
+	/// value (followed by all changes over time) for each subscription.
+	public var bridged: RACSignal<Value.Wrapped> {
+		return self.producer.map { $0.optional }.bridged
+	}
+}
+
 // MARK: - Actions
 
 extension Action {
