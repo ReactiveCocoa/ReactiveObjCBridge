@@ -643,11 +643,11 @@
 					};
 					D047260B19E49F82006002AA = {
 						CreatedOnToolsVersion = 6.1;
-						LastSwiftMigration = 0830;
+						LastSwiftMigration = 0920;
 					};
 					D047261519E49F82006002AA = {
 						CreatedOnToolsVersion = 6.1;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0920;
 					};
 				};
 			};
@@ -1144,6 +1144,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1160,6 +1161,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -1174,6 +1176,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1188,6 +1191,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -1253,6 +1257,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Profile;
 		};
@@ -1267,6 +1272,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Profile;
 		};
@@ -1332,6 +1338,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Test;
 		};
@@ -1346,6 +1353,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Test;
 		};
