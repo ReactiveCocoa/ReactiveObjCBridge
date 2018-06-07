@@ -418,7 +418,7 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 }
 
 extension Action {
-	fileprivate var isEnabled: RACSignal<NSNumber> {
+	fileprivate var isEnabledSignal: RACSignal<NSNumber> {
 		return self.isEnabled.producer.map { $0 as NSNumber }.bridged
 	}
 }
@@ -462,7 +462,7 @@ extension Action where Input: AnyObject, Output: AnyObject {
 	///         when the action is. However, the reverse is always true: the Action
 	///         will always be marked as executing when the `RACCommand` is.
 	public var bridged: RACCommand<Input, Output> {
-		return RACCommand<Input, Output>(enabled: isEnabled) { input -> RACSignal<Output> in
+		return RACCommand<Input, Output>(enabled: isEnabledSignal) { input -> RACSignal<Output> in
 			return self.apply(input!).bridged
 		}
 	}
@@ -478,7 +478,7 @@ extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output
 	///         when the action is. However, the reverse is always true: the Action
 	///         will always be marked as executing when the `RACCommand` is.
 	public var bridged: RACCommand<Input.Wrapped, Output> {
-		return RACCommand<Input.Wrapped, Output>(enabled: isEnabled) { input -> RACSignal<Output> in
+		return RACCommand<Input.Wrapped, Output>(enabled: isEnabledSignal) { input -> RACSignal<Output> in
 			return self.apply(Input(reconstructing: input)).bridged
 		}
 	}
@@ -494,7 +494,7 @@ extension Action where Input: AnyObject, Output: OptionalProtocol, Output.Wrappe
 	///         when the action is. However, the reverse is always true: the Action
 	///         will always be marked as executing when the `RACCommand` is.
 	public var bridged: RACCommand<Input, Output.Wrapped> {
-		return RACCommand<Input, Output.Wrapped>(enabled: isEnabled) { input -> RACSignal<Output.Wrapped> in
+		return RACCommand<Input, Output.Wrapped>(enabled: isEnabledSignal) { input -> RACSignal<Output.Wrapped> in
 			return self.apply(input!).bridged
 		}
 	}
@@ -510,7 +510,7 @@ extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output
 	///         when the action is. However, the reverse is always true: the Action
 	///         will always be marked as executing when the RACCommand is.
 	public var bridged: RACCommand<Input.Wrapped, Output.Wrapped> {
-		return RACCommand<Input.Wrapped, Output.Wrapped>(enabled: isEnabled) { input -> RACSignal<Output.Wrapped> in
+		return RACCommand<Input.Wrapped, Output.Wrapped>(enabled: isEnabledSignal) { input -> RACSignal<Output.Wrapped> in
 			return self.apply(Input(reconstructing: input)).bridged
 		}
 	}
