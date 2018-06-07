@@ -164,7 +164,7 @@ private final class RACSwiftScheduler: RACScheduler {
 		}
 	}
 
-	open override func schedule(_ block: @escaping () -> Void) -> RACDisposable? {
+	override func schedule(_ block: @escaping () -> Void) -> RACDisposable? {
 		switch base {
 		case let .scheduler(scheduler):
 			return scheduler.schedule(wrap(block)).map(RACDisposable.init)
@@ -174,7 +174,7 @@ private final class RACSwiftScheduler: RACScheduler {
 		}
 	}
 
-	open override func after(_ date: Date, schedule block: @escaping () -> Swift.Void) -> RACDisposable? {
+	override func after(_ date: Date, schedule block: @escaping () -> Swift.Void) -> RACDisposable? {
 		switch base {
 		case let .scheduler(scheduler):
 			Thread.sleep(until: date)
@@ -186,7 +186,7 @@ private final class RACSwiftScheduler: RACScheduler {
 		}
 	}
 
-	open override func after(_ date: Date, repeatingEvery interval: TimeInterval, withLeeway leeway: TimeInterval, schedule block: @escaping () -> Void) -> RACDisposable? {
+	override func after(_ date: Date, repeatingEvery interval: TimeInterval, withLeeway leeway: TimeInterval, schedule block: @escaping () -> Void) -> RACDisposable? {
 		switch base {
 		case let .scheduler(scheduler):
 			assertionFailure("Undefined behavior.")
