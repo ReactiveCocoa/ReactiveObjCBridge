@@ -1113,6 +1113,7 @@
 					"$(PROJECT_DIR)/build/Debug",
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
 			};
 			name = Debug;
@@ -1127,6 +1128,7 @@
 					"$(PROJECT_DIR)/build/Debug",
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
 			};
 			name = Release;
@@ -1236,6 +1238,7 @@
 					"$(PROJECT_DIR)/build/Debug",
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
 			};
 			name = Profile;
@@ -1315,6 +1318,7 @@
 					"$(PROJECT_DIR)/build/Debug",
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
 			};
 			name = Test;
