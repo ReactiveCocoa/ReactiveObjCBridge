@@ -91,7 +91,7 @@ extension ImmediateScheduler {
 	/// Create `RACScheduler` that performs actions instantly.
 	///
 	/// - returns: `RACScheduler` that instantly performs actions.
-	@available(*, deprecated, message:"Use `RACScheduler.immediate` directly, or `RACScheduler.init` in a generic context.")
+	@available(*, unavailable, message: "Use `RACScheduler.immediate` directly, or `RACScheduler.init` in a generic context.")
 	public func toRACScheduler() -> RACScheduler {
 		return RACScheduler.immediate()
 	}
@@ -101,7 +101,7 @@ extension UIScheduler {
 	/// Create `RACScheduler` for `UIScheduler`
 	///
 	/// - returns: `RACScheduler` instance that queues events on main thread.
-	@available(*, deprecated, message:"Use `RACScheduler.init` to wrap an `UIScheduler` instead.")
+	@available(*, unavailable, message: "Use `RACScheduler.init` to wrap an `UIScheduler` instead.")
 	public func toRACScheduler() -> RACScheduler {
 		return RACScheduler(self)
 	}
@@ -112,7 +112,7 @@ extension QueueScheduler {
 	///
 	/// - returns: Instance `RACScheduler` that queues events on
 	///            `QueueScheduler`'s queue.
-	@available(*, deprecated, message:"Use `RACScheduler.init` to wrap a `QueueScheduler` instead.")
+	@available(*, unavailable, message: "Use `RACScheduler.init` to wrap a `QueueScheduler` instead.")
 	public func toRACScheduler() -> RACScheduler {
 		return RACScheduler(self)
 	}
@@ -324,7 +324,7 @@ extension SignalProducerProtocol where Value: AnyObject {
 		}
 	}
 
-	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	@available(*, unavailable, message: "Use the `bridged` property instead.")
 	public func toRACSignal() -> RACSignal<Value> { return bridged }
 }
 
@@ -355,7 +355,7 @@ extension SignalProducerProtocol where Value: OptionalProtocol, Value.Wrapped: A
 		}
 	}
 
-	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	@available(*, unavailable, message: "Use the `bridged` property instead.")
 	public func toRACSignal() -> RACSignal<Value.Wrapped> { return bridged }
 }
 
@@ -382,7 +382,7 @@ extension SignalProtocol where Value: AnyObject {
 		}
 	}
 
-	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	@available(*, unavailable, message: "Use the `bridged` property instead.")
 	public func toRACSignal() -> RACSignal<Value> { return bridged }
 }
 
@@ -413,7 +413,7 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 		}
 	}
 
-	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	@available(*, unavailable, message: "Use the `bridged` property instead.")
 	public func toRACSignal() -> RACSignal<Value.Wrapped> { return bridged }
 }
 
@@ -467,7 +467,7 @@ extension Action where Input: AnyObject, Output: AnyObject {
 		}
 	}
 
-	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	@available(*, unavailable, message: "Use the `bridged` property instead.")
 	public func toRACCommand() -> RACCommand<Input, Output> { return bridged }
 }
 
@@ -483,7 +483,7 @@ extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output
 		}
 	}
 
-	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	@available(*, unavailable, message: "Use the `bridged` property instead.")
 	public func toRACCommand() -> RACCommand<Input.Wrapped, Output> { return bridged }
 }
 
@@ -499,7 +499,7 @@ extension Action where Input: AnyObject, Output: OptionalProtocol, Output.Wrappe
 		}
 	}
 
-	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	@available(*, unavailable, message: "Use the `bridged` property instead.")
 	public func toRACCommand() -> RACCommand<Input, Output.Wrapped> { return bridged }
 }
 
@@ -515,7 +515,7 @@ extension Action where Input: OptionalProtocol, Input.Wrapped: AnyObject, Output
 		}
 	}
 
-	@available(*, deprecated, message:"Use the `bridged` property instead.")
+	@available(*, unavailable, message: "Use the `bridged` property instead.")
 	public func toRACCommand() -> RACCommand<Input.Wrapped, Output.Wrapped> { return bridged }
 }
 
