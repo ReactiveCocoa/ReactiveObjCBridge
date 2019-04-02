@@ -1,2 +1,2 @@
-github "jakovi89/ReactiveObjC" "swift-4.2" #Should point to "ReactiveCocoa/ReactiveObjC"
+github "ReactiveCocoa/ReactiveObjC" "27a7254837bb01122b51aac7c4c3961973351ca0"
 github "ReactiveCocoa/ReactiveSwift" ~> 5.0.0
