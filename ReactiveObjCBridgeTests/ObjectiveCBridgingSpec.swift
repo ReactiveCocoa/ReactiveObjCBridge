@@ -9,7 +9,6 @@
 import ReactiveObjC
 import ReactiveObjCBridge
 import ReactiveSwift
-import Result
 import Nimble
 import Quick
 import XCTest
@@ -84,7 +83,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				let producer = SignalProducer(racSignal)
 				let result = producer.last()
 
-				expect(result?.error) == AnyError(error)
+				expect(result?.error as? TestError) == error
 			}
 		}
 
@@ -94,7 +93,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			let testNSError = NSError(domain: "TestDomain", code: 1, userInfo: userInfo)
 			describe("on a Signal") {
 				it("should forward events") {
-					let (signal, observer) = Signal<NSNumber, NoError>.pipe()
+					let (signal, observer) = Signal<NSNumber, Never>.pipe()
 					let racSignal = signal.bridged
 
 					var lastValue: NSNumber?
@@ -166,7 +165,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 				it("should start once per subscription") {
 					var subscriptions = 0
 
-					let producer = SignalProducer<NSNumber, NoError> { () -> Result<NSNumber, NoError> in
+					let producer = SignalProducer<NSNumber, Never> { () -> Result<NSNumber, Never> in
 						defer {
 							subscriptions += 1
 						}
@@ -215,7 +214,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 			var enabledSubject: RACSubject<NSNumber>!
 			var enabled = false
 
-			var action: Action<NSNumber?, NSNumber?, AnyError>!
+			var action: Action<NSNumber?, NSNumber?, Swift.Error>!
 
 			beforeEach {
 				enabledSubject = RACSubject()
@@ -565,7 +564,7 @@ class ObjectiveCBridgingSpec: QuickSpec {
 	}
 }
 
-extension SignalProducer where Error == NoError {
+extension SignalProducer where Error == Never {
 	/// Create a `SignalProducer` that will attempt the given operation once for
 	/// each invocation of `start()`.
 	///
@@ -575,14 +574,13 @@ extension SignalProducer where Error == NoError {
 	///
 	/// - parameters:
 	///   - action: A closure that returns instance of `Result`.
-	public init(_ action: @escaping () -> Result<Value, NoError>) {
+	public init(_ action: @escaping () -> Result<Value, Never>) {
 		self.init { observer, _ in
-			action().analysis(ifSuccess: { value in
+			switch action() {
+			case .success(let value):
 				observer.send(value: value)
 				observer.sendCompleted()
-			}, ifFailure: { error in
-				observer.send(error: error)
-			})
+			}
 		}
 	}
 }

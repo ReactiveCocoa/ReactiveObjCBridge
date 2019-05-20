@@ -9,7 +9,24 @@
 import Foundation
 import ReactiveObjC
 import ReactiveSwift
-import Result
+
+enum ReactiveObjCBridgeError: Error, CustomNSError {
+	case message(message: String)
+	
+	var localizedDescription: String {
+		switch self {
+		case .message(let message):
+			return message
+		}
+	}
+	
+	var errorUserInfo: [String : Any] {
+		switch self {
+		case .message(let message):
+			return ["message": message]
+		}
+	}
+}
 
 extension SignalProtocol {
 	/// Turns each value into an Optional.
@@ -202,20 +219,20 @@ private final class RACSwiftScheduler: RACScheduler {
 	}
 }
 
-private func defaultNSError(_ message: String) -> NSError {
-	return Result<(), NSError>.error(message)
-}
-
-private func defaultNSError(_ message: String, file: String, line: Int) -> NSError {
-	return Result<(), NSError>.error(message, file: file, line: line)
-}
+//private func defaultNSError(_ message: String) -> NSError {
+//	return Result<(), NSError>.error(message)
+//}
+//
+//private func defaultNSError(_ message: String, file: String, line: Int) -> NSError {
+//	return Result<(), NSError>.error(message, file: file, line: line)
+//}
 
 @available(*, unavailable, renamed:"SignalProducer(_:)")
-public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>) -> SignalProducer<Value?, AnyError> {
+public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>) -> SignalProducer<Value?, Swift.Error> {
 	fatalError()
 }
 
-extension SignalProducer where Error == AnyError {
+extension SignalProducer where Error == Swift.Error {
 	/// Create a `SignalProducer` which will subscribe to the provided signal once
 	/// for each invocation of `start()`.
 	///
@@ -224,7 +241,7 @@ extension SignalProducer where Error == AnyError {
 	public init<SignalValue>(_ signal: RACSignal<SignalValue>) where Value == SignalValue? {
 		self.init { observer, disposable in
 			let failed: (_ error: Swift.Error?) -> Void = { error in
-				observer.send(error: AnyError(error ?? defaultNSError("Nil RACSignal error")))
+				observer.send(error: error ?? ReactiveObjCBridgeError.message(message: "Nil RACSignal error"))
 			}
 
 			disposable += signal.subscribeNext(observer.send(value:),
@@ -234,7 +251,7 @@ extension SignalProducer where Error == AnyError {
 	}
 }
 
-extension SignalProducer where Error == AnyError {
+extension SignalProducer where Error == Swift.Error {
 	/// Create a `SignalProducer` of 1-tuples which will subscribe to the provided
 	/// signal once for each invocation of `start()`.
 	///
@@ -291,7 +308,7 @@ extension SignalProducer where Error == AnyError {
 	internal init<OriginalValue, NewValue>(_ signal: RACSignal<OriginalValue>, transform: @escaping (OriginalValue) -> NewValue?) where Value == NewValue? {
 		self.init { observer, disposable in
 			let failed: (_ error: Swift.Error?) -> Void = { error in
-				observer.send(error: AnyError(error ?? defaultNSError("Nil RACSignal error")))
+				observer.send(error: error ?? ReactiveObjCBridgeError.message(message: "Nil RACSignal error"))
 			}
 
 			disposable += signal.subscribeNext({ observer.send(value: $0.flatMap(transform)) },
@@ -424,11 +441,11 @@ extension Action {
 }
 
 @available(*, unavailable, renamed:"Action(_:)")
-public func bridgedAction<Input, Output>(from command: RACCommand<Input, Output>) -> Action<Input?, Output?, AnyError> {
+public func bridgedAction<Input, Output>(from command: RACCommand<Input, Output>) -> Action<Input?, Output?, Swift.Error> {
 	fatalError()
 }
 
-extension Action where Error == AnyError {
+extension Action where Error == Swift.Error {
 	/// Create an Action that wraps the given command.
 	///
 	/// - note: The created `Action` will not necessarily be marked as executing
@@ -445,9 +462,9 @@ extension Action where Error == AnyError {
 
 		enabledProperty <~ SignalProducer(command.enabled)
 			.map { $0 as! Bool }
-			.flatMapError { _ in SignalProducer<Bool, NoError>(value: false) }
+			.flatMapError { _ in SignalProducer<Bool, Never>(value: false) }
 
-		self.init(enabledIf: enabledProperty) { input -> SignalProducer<Output, AnyError> in
+		self.init(enabledIf: enabledProperty) { input -> SignalProducer<Output, Swift.Error> in
 			let signal: RACSignal<CommandOutput> = command.execute(input)
 
 			return SignalProducer(signal)
@@ -575,30 +592,20 @@ public func bridgedTuple<First, Second, Third, Fourth, Fifth>(from tuple: RACFiv
 
 extension DispatchTimeInterval {
 	fileprivate var timeInterval: TimeInterval {
-		#if swift(>=3.2)
-			switch self {
-			case let .seconds(s):
-				return TimeInterval(s)
-			case let .milliseconds(ms):
-				return TimeInterval(TimeInterval(ms) / 1000.0)
-			case let .microseconds(us):
-				return TimeInterval(Int64(us) * Int64(NSEC_PER_USEC)) / TimeInterval(NSEC_PER_SEC)
-			case let .nanoseconds(ns):
-				return TimeInterval(ns) / TimeInterval(NSEC_PER_SEC)
-			case .never:
-				return .infinity
-			}
-		#else
-			switch self {
-			case let .seconds(s):
-				return TimeInterval(s)
-			case let .milliseconds(ms):
-				return TimeInterval(TimeInterval(ms) / 1000.0)
-			case let .microseconds(us):
-				return TimeInterval(Int64(us) * Int64(NSEC_PER_USEC)) / TimeInterval(NSEC_PER_SEC)
-			case let .nanoseconds(ns):
-				return TimeInterval(ns) / TimeInterval(NSEC_PER_SEC)
-			}
-		#endif
+		switch self {
+		case let .seconds(s):
+			return TimeInterval(s)
+		case let .milliseconds(ms):
+			return TimeInterval(TimeInterval(ms) / 1000.0)
+		case let .microseconds(us):
+			return TimeInterval(Int64(us) * Int64(NSEC_PER_USEC)) / TimeInterval(NSEC_PER_SEC)
+		case let .nanoseconds(ns):
+			return TimeInterval(ns) / TimeInterval(NSEC_PER_SEC)
+		case .never:
+			return .infinity
+		@unknown default:
+			assertionFailure()
+			return .infinity
+		}
 	}
 }
