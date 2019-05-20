@@ -219,14 +219,6 @@ private final class RACSwiftScheduler: RACScheduler {
 	}
 }
 
-//private func defaultNSError(_ message: String) -> NSError {
-//	return Result<(), NSError>.error(message)
-//}
-//
-//private func defaultNSError(_ message: String, file: String, line: Int) -> NSError {
-//	return Result<(), NSError>.error(message, file: file, line: line)
-//}
-
 @available(*, unavailable, renamed:"SignalProducer(_:)")
 public func bridgedSignalProducer<Value>(from signal: RACSignal<Value>) -> SignalProducer<Value?, Swift.Error> {
 	fatalError()
