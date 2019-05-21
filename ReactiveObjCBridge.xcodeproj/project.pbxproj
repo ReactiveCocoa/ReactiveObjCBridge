@@ -8,13 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		57A4D1B71BA13D7A00F7D4B1 /* ObjectiveCBridging.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C312C419EF2A5800984962 /* ObjectiveCBridging.swift */; };
-		57A4D2081BA13D7A00F7D4B1 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDC42E2E1AE7AB8B00965373 /* Result.framework */; };
 		57A4D20A1BA13D7A00F7D4B1 /* ReactiveObjCBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = D04725EF19E49ED7006002AA /* ReactiveObjCBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7DFBED081CDB8C9500EE435B /* ReactiveObjCBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57A4D2411BA13D7A00F7D4B1 /* ReactiveObjCBridge.framework */; };
 		7DFBED1E1CDB8D7000EE435B /* ReactiveObjCBridge.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 57A4D2411BA13D7A00F7D4B1 /* ReactiveObjCBridge.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7DFBED1F1CDB8D7800EE435B /* Quick.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D037672B19EDA75D00A782A9 /* Quick.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7DFBED201CDB8D7D00EE435B /* Nimble.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D05E662419EDD82000904ACA /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7DFBED211CDB8D8300EE435B /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CDC42E2E1AE7AB8B00965373 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7DFBED271CDB8DE300EE435B /* ObjectiveCBridgingSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A226101A72F30B00D33B74 /* ObjectiveCBridgingSpec.swift */; };
 		9AB5CD651EDAC351004ECB57 /* RACScheduler+SwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 9AB5CD631EDAC351004ECB57 /* RACScheduler+SwiftSupport.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		9AB5CD661EDAC351004ECB57 /* RACScheduler+SwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 9AB5CD631EDAC351004ECB57 /* RACScheduler+SwiftSupport.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -25,7 +23,6 @@
 		9AB5CD6B1EDAC351004ECB57 /* RACScheduler+SwiftSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5CD641EDAC351004ECB57 /* RACScheduler+SwiftSupport.m */; };
 		9AB5CD6C1EDAC351004ECB57 /* RACScheduler+SwiftSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AB5CD641EDAC351004ECB57 /* RACScheduler+SwiftSupport.m */; };
 		A9B315BF1B3940810001CB9C /* ObjectiveCBridging.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C312C419EF2A5800984962 /* ObjectiveCBridging.swift */; };
-		A9B315C91B3940980001CB9C /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDC42E2E1AE7AB8B00965373 /* Result.framework */; };
 		A9B315CA1B3940AB0001CB9C /* ReactiveObjCBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = D04725EF19E49ED7006002AA /* ReactiveObjCBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE330A0F1D634F1E00806963 /* ReactiveSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE330A0E1D634F1E00806963 /* ReactiveSwift.framework */; };
 		BE330A111D634F2900806963 /* ReactiveSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE330A101D634F2900806963 /* ReactiveSwift.framework */; };
@@ -44,10 +41,6 @@
 		BEA5E5E81D864E7600A1F0F2 /* TestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA5E5E61D864E7200A1F0F2 /* TestError.swift */; };
 		BEA5E5E91D864E7700A1F0F2 /* TestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA5E5E61D864E7200A1F0F2 /* TestError.swift */; };
 		BEA5E5EA1D864E7900A1F0F2 /* TestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA5E5E61D864E7200A1F0F2 /* TestError.swift */; };
-		CDC42E2F1AE7AB8B00965373 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDC42E2E1AE7AB8B00965373 /* Result.framework */; };
-		CDC42E301AE7AB8B00965373 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDC42E2E1AE7AB8B00965373 /* Result.framework */; };
-		CDC42E311AE7AB8B00965373 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDC42E2E1AE7AB8B00965373 /* Result.framework */; };
-		CDC42E331AE7AC6D00965373 /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CDC42E2E1AE7AB8B00965373 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CDF066CA1CDC1CA200199626 /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D05E662419EDD82000904ACA /* Nimble.framework */; };
 		CDF066CB1CDC1CA200199626 /* Quick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D037672B19EDA75D00A782A9 /* Quick.framework */; };
 		D01B7B6219EDD8FE00D26E01 /* Nimble.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D05E662419EDD82000904ACA /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -98,7 +91,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7DFBED211CDB8D8300EE435B /* Result.framework in Copy Frameworks */,
 				7DFBED201CDB8D7D00EE435B /* Nimble.framework in Copy Frameworks */,
 				7DFBED1F1CDB8D7800EE435B /* Quick.framework in Copy Frameworks */,
 				7DFBED1E1CDB8D7000EE435B /* ReactiveObjCBridge.framework in Copy Frameworks */,
@@ -112,7 +104,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				CDC42E331AE7AC6D00965373 /* Result.framework in Copy Frameworks */,
 				D01B7B6219EDD8FE00D26E01 /* Nimble.framework in Copy Frameworks */,
 				D01B7B6319EDD8FE00D26E01 /* Quick.framework in Copy Frameworks */,
 				D01B7B6419EDD94B00D26E01 /* ReactiveObjCBridge.framework in Copy Frameworks */,
@@ -190,7 +181,6 @@
 			files = (
 				BEA5E5E31D864DED00A1F0F2 /* ReactiveObjC.framework in Frameworks */,
 				BE330A191D634F5900806963 /* ReactiveSwift.framework in Frameworks */,
-				57A4D2081BA13D7A00F7D4B1 /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,7 +202,6 @@
 			files = (
 				BEA5E5E11D864DE800A1F0F2 /* ReactiveObjC.framework in Frameworks */,
 				BE330A171D634F4E00806963 /* ReactiveSwift.framework in Frameworks */,
-				A9B315C91B3940980001CB9C /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,7 +211,6 @@
 			files = (
 				BEA5E5D91D864DC900A1F0F2 /* ReactiveObjC.framework in Frameworks */,
 				BE330A0F1D634F1E00806963 /* ReactiveSwift.framework in Frameworks */,
-				CDC42E2F1AE7AB8B00965373 /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,7 +220,6 @@
 			files = (
 				BEA5E5DB1D864DD100A1F0F2 /* ReactiveObjC.framework in Frameworks */,
 				BE330A111D634F2900806963 /* ReactiveSwift.framework in Frameworks */,
-				CDC42E301AE7AB8B00965373 /* Result.framework in Frameworks */,
 				D05E662519EDD82000904ACA /* Nimble.framework in Frameworks */,
 				D037672D19EDA75D00A782A9 /* Quick.framework in Frameworks */,
 				D04725F619E49ED7006002AA /* ReactiveObjCBridge.framework in Frameworks */,
@@ -245,7 +232,6 @@
 			files = (
 				BEA5E5DD1D864DD800A1F0F2 /* ReactiveObjC.framework in Frameworks */,
 				BE330A131D634F2E00806963 /* ReactiveSwift.framework in Frameworks */,
-				CDC42E311AE7AB8B00965373 /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -619,7 +605,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = GitHub;
 				TargetAttributes = {
 					57A4D1AF1BA13D7A00F7D4B1 = {
@@ -829,7 +815,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -850,7 +836,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Test;
 		};
@@ -871,7 +857,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -892,7 +878,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Profile;
 		};
@@ -908,7 +894,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -924,7 +910,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Test;
 		};
@@ -940,7 +926,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -956,7 +942,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Profile;
 		};
@@ -977,7 +963,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -998,7 +984,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Test;
 		};
@@ -1019,7 +1005,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -1040,7 +1026,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Profile;
 		};
@@ -1049,6 +1035,7 @@
 			baseConfigurationReference = D047262919E49FE8006002AA /* Debug.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1060,7 +1047,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactivecocoa.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(PROJECT_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1073,6 +1060,7 @@
 			baseConfigurationReference = D047262B19E49FE8006002AA /* Release.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1085,7 +1073,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactivecocoa.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1106,7 +1094,7 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -1123,7 +1111,7 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -1139,7 +1127,7 @@
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -1155,7 +1143,7 @@
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -1172,7 +1160,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -1189,7 +1177,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -1204,7 +1192,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -1219,7 +1207,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -1228,6 +1216,7 @@
 			baseConfigurationReference = D047262A19E49FE8006002AA /* Profile.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1238,7 +1227,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactivecocoa.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(PROJECT_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1259,7 +1248,7 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Profile;
 		};
@@ -1275,7 +1264,7 @@
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Profile;
 		};
@@ -1292,7 +1281,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Profile;
 		};
@@ -1307,7 +1296,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Profile;
 		};
@@ -1316,6 +1305,7 @@
 			baseConfigurationReference = D047262C19E49FE8006002AA /* Test.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1326,7 +1316,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactivecocoa.$(PRODUCT_NAME:rfc1034identifier)-Tests";
 				PRODUCT_NAME = "$(PROJECT_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1347,7 +1337,7 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Test;
 		};
@@ -1363,7 +1353,7 @@
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Test;
 		};
@@ -1380,7 +1370,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridge/Info.plist;
 				MODULEMAP_FILE = "$(SRCROOT)/ReactiveObjCBridge/module.modulemap";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Test;
 		};
@@ -1395,7 +1385,7 @@
 				);
 				INFOPLIST_FILE = ReactiveObjCBridgeTests/Info.plist;
 				PRODUCT_NAME = "$(PROJECT_NAME)Tests";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Test;
 		};

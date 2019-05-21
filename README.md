@@ -26,7 +26,7 @@ and “hot” signals are represented by the `Signal` type.
 `SignalProducer` initializer:
 
 ```swift
-extension SignalProducer where Error == AnyError {
+extension SignalProducer where Error == Swift.Error {
 	public init<SignalValue>(_ signal: RACSignal<SignalValue>) where Value == SignalValue?
 }
 ```
@@ -69,7 +69,7 @@ extension SignalProtocol where Value: OptionalProtocol, Value.Wrapped: AnyObject
 tuples with a special initializer, `init(bridging:)`:
 
 ```swift
-extension SignalProducer where Error == AnyError {
+extension SignalProducer where Error == Swift.Error {
 	public init<First>(bridging tupleSignal: RACSignal<RACOneTuple<First>>) where Value == First?
   public init<First, Second>(bridging tupleSignal: RACSignal<RACTwoTuple<First, Second>>) where Value == (First?, Second?)?
   public init<First, Second, Third>(bridging tupleSignal: RACSignal<RACThreeTuple<First, Second, Third>>) where Value == (First?, Second?, Third?)?
@@ -83,7 +83,7 @@ extension SignalProducer where Error == AnyError {
 To convert `RACCommand`s into the new `Action` type, use the `Action` initializer:
 
 ```swift
-extension Action where Error == AnyError {
+extension Action where Error == Swift.Error {
 	public convenience init<CommandInput, CommandOutput>(
 		_ command: RACCommand<CommandInput, CommandOutput>
 	) where Input == CommandInput?, Output == CommandOutput?
