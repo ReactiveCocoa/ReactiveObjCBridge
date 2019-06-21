@@ -46,9 +46,11 @@ matrix:
         - carthage build --no-skip-current --platform watchOS
       env:
         - JOB=CARTHAGE-watchOS
-    - script:
-      - pod repo update --verbose
-      - pod lib lint --allow-warnings
+    - install:
+        - gem update cocoapods
+      script:
+        - pod repo update --verbose
+        - pod lib lint --allow-warnings
       env:
         - JOB=PODSPEC
 notifications:
