@@ -1,5 +1,5 @@
-github "Quick/Nimble" "v8.0.1"
+github "Quick/Nimble" "v8.0.2"
 github "Quick/Quick" "v2.1.0"
 github "ReactiveCocoa/ReactiveObjC" "3.1.1"
 github "ReactiveCocoa/ReactiveSwift" "6.1.0"
-github "jspahrsummers/xcconfigs" "3d9d99634cae6d586e272543d527681283b33eb0"
+github "jspahrsummers/xcconfigs" "d0f8992afad45262cfe3a3cf512e7127fdcf296c"
